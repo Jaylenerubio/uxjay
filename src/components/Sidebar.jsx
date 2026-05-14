@@ -1,45 +1,49 @@
-export default function Sidebar({ active, onNav }) {
-  const pendingDocs = 5;
-  const pendingNotices = 2;
+import { Icon } from './Icons';
 
+const NAV_ITEMS = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { key: 'activity',  label: 'Activity',  icon: 'activity'  },
+  { key: 'clients',   label: 'Clients',   icon: 'clients'   },
+  { key: 'documents', label: 'Documents', icon: 'documents' },
+];
+
+export default function Sidebar({ active, onNav }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <h1>CaseFlow</h1>
-        <span>Document Management</span>
+        <div className="sidebar-brand-icon">CF</div>
+        <span className="sidebar-brand-text">CaseFlow</span>
       </div>
 
-      <div className="sidebar-section" style={{ marginTop: 8 }}>
-        <div className="sidebar-section-label">Caseworker</div>
-        <div className={`nav-item ${active === 'dashboard' ? 'active' : ''}`} onClick={() => onNav('dashboard')}>
-          <span>⊞</span> Dashboard
-        </div>
-        <div className={`nav-item ${active === 'queue' ? 'active' : ''}`} onClick={() => onNav('queue')}>
-          <span>📄</span> Document Queue
-          {pendingDocs > 0 && <span className="nav-badge">{pendingDocs}</span>}
-        </div>
-        <div className={`nav-item ${active === 'notices' ? 'active' : ''}`} onClick={() => onNav('notices')}>
-          <span>🔔</span> Notices
-          {pendingNotices > 0 && <span className="nav-badge yellow">{pendingNotices}</span>}
-        </div>
-        <div className={`nav-item ${active === 'clients' ? 'active' : ''}`} onClick={() => onNav('clients')}>
-          <span>👤</span> Clients
-        </div>
-      </div>
+      <nav className="sidebar-nav">
+        {NAV_ITEMS.map(item => (
+          <div
+            key={item.key}
+            className={`nav-item${active === item.key ? ' active' : ''}`}
+            onClick={() => onNav(item.key)}
+            title={item.label}
+          >
+            <span className="nav-icon">
+              <Icon name={item.icon} size={18} />
+            </span>
+            <span className="nav-label">{item.label}</span>
+          </div>
+        ))}
+      </nav>
 
-      <div className="sidebar-section" style={{ marginTop: 16 }}>
-        <div className="sidebar-section-label">Agency</div>
-        <div className={`nav-item ${active === 'agency' ? 'active' : ''}`} onClick={() => onNav('agency')}>
-          <span>🏢</span> Agency Documents
+      <div className="sidebar-bottom">
+        <div className="nav-item" title="Settings">
+          <span className="nav-icon">
+            <Icon name="settings" size={18} />
+          </span>
+          <span className="nav-label">Settings</span>
         </div>
-        <div className={`nav-item ${active === 'activity' ? 'active' : ''}`} onClick={() => onNav('activity')}>
-          <span>⚡</span> Latest Activity
+        <div className="nav-item" style={{ cursor: 'default' }} title="Jordan Reyes">
+          <span className="nav-icon">
+            <div className="sidebar-avatar">JR</div>
+          </span>
+          <span className="nav-label" style={{ fontSize: 12 }}>Jordan Reyes</span>
         </div>
-      </div>
-
-      <div className="sidebar-user">
-        <strong>Jordan Reyes</strong>
-        Caseworker · Region 4
       </div>
     </aside>
   );

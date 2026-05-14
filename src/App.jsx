@@ -1,53 +1,69 @@
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
-import DocumentQueue from './components/DocumentQueue';
-import Notices from './components/Notices';
-import Activity from './components/Activity';
+import ActivityPage from './components/ActivityPage';
+import ClientsPage from './components/ClientsPage';
+import DocumentsPage from './components/DocumentsPage';
+import ClientDetail from './components/ClientDetail';
 
 const PAGE_TITLES = {
-  dashboard: 'Dashboard',
-  queue: 'Document Queue',
-  notices: 'Notices',
+  dashboard: 'Overview',
+  activity: 'Activity',
   clients: 'Clients',
-  agency: 'Agency Documents',
-  activity: 'Latest Activity',
+  documents: 'All Documents',
+  clientDetail: 'Client Detail',
 };
-
-function Placeholder({ name }) {
-  return (
-    <div className="page">
-      <div className="card">
-        <div className="card-body" style={{ textAlign: 'center', padding: 60, color: 'var(--gray-400)' }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>🚧</div>
-          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>{name}</div>
-          <div style={{ fontSize: 13 }}>This section is not yet prototyped.</div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function App() {
   const [page, setPage] = useState('dashboard');
+  const [selectedClientId, setSelectedClientId] = useState(null);
+
+  function handleNav(key) {
+    setPage(key);
+    if (key !== 'clientDetail') setSelectedClientId(null);
+  }
+
+  function handleClientSelect(clientId) {
+    setSelectedClientId(clientId);
+    setPage('clientDetail');
+  }
+
+  function handleBack() {
+    setPage('clients');
+    setSelectedClientId(null);
+  }
 
   function renderPage() {
     switch (page) {
-      case 'dashboard': return <Dashboard onNav={setPage} />;
-      case 'queue': return <DocumentQueue />;
-      case 'notices': return <Notices />;
-      case 'activity': return <Activity />;
-      default: return <Placeholder name={PAGE_TITLES[page] || page} />;
+      case 'dashboard':   return <Dashboard />;
+      case 'activity':    return <ActivityPage />;
+      case 'clients':     return <ClientsPage onClientSelect={handleClientSelect} />;
+      case 'documents':   return <DocumentsPage />;
+      case 'clientDetail': return <ClientDetail clientId={selectedClientId} onBack={handleBack} />;
+      default:            return <Dashboard />;
     }
   }
 
+  const title = page === 'clientDetail' ? 'Client Detail' : PAGE_TITLES[page] || page;
+
   return (
     <div className="layout">
-      <Sidebar active={page} onNav={setPage} />
+      <Sidebar active={page === 'clientDetail' ? 'clients' : page} onNav={handleNav} />
       <div className="main-content">
-        <div className="topbar">
-          <h2>{PAGE_TITLES[page]}</h2>
-          <span className="topbar-date">May 14, 2026</span>
+        <div style={{
+          height: 52,
+          background: '#fff',
+          borderBottom: '1px solid var(--card-border)',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 24px',
+          gap: 16,
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+        }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, flex: 1 }}>{title}</h2>
+          <span style={{ fontSize: 12, color: 'var(--gray-400)' }}>May 14, 2026</span>
         </div>
         {renderPage()}
       </div>
