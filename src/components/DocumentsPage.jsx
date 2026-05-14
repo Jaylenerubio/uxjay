@@ -34,34 +34,42 @@ export default function DocumentsPage() {
 
   return (
     <div className="page">
-      <div className="section-title">All Documents</div>
+      {/* Page heading */}
+      <h1 className="page-heading">Documents</h1>
 
-      {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+      {/* Stat cards (3 columns) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 28 }}>
         <div className="stat-card">
           <div className="stat-label">New</div>
           <div className="stat-value" style={{ color: 'var(--blue)' }}>{newCount}</div>
-          <div className="stat-sub">05/01/26 – 05/14/26</div>
+          <div style={{ fontSize: 13, color: 'var(--gray-500)', fontFamily: 'Public Sans, sans-serif', marginTop: 6 }}>
+            05/01/26 – 05/14/26
+          </div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Resubmitted</div>
           <div className="stat-value" style={{ color: 'var(--indigo)' }}>{resubmittedCount}</div>
-          <div className="stat-sub">Awaiting review</div>
+          <div style={{ fontSize: 13, color: 'var(--gray-500)', fontFamily: 'Public Sans, sans-serif', marginTop: 6 }}>
+            Awaiting review
+          </div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Approved</div>
-          <div className="stat-value" style={{ color: 'var(--green)' }}>{approvedCount}</div>
-          <div className="stat-sub">This period</div>
+          <div className="stat-value" style={{ color: 'var(--green-trend)' }}>{approvedCount}</div>
+          <div style={{ fontSize: 13, color: 'var(--gray-500)', fontFamily: 'Public Sans, sans-serif', marginTop: 6 }}>
+            This period
+          </div>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table card */}
       <div className="card">
+        {/* Filter tabs */}
         <div className="filter-tabs">
           {TABS.map(tab => (
             <button
               key={tab}
-              className={`filter-tab${activeTab === tab ? ' active' : ''}`}
+              className={`filter-tab ${activeTab === tab ? 'active' : 'inactive'}`}
               onClick={() => setActiveTab(tab)}
             >
               {tab}
@@ -84,25 +92,26 @@ export default function DocumentsPage() {
           <tbody>
             {filtered.map(doc => (
               <tr key={doc.id}>
-                <td style={{ fontWeight: 500 }}>{doc.name}</td>
-                <td style={{ color: 'var(--gray-700)' }}>{doc.objectName}</td>
-                <td style={{ color: 'var(--gray-600)', fontSize: 12 }}>{doc.familyMember}</td>
+                <td style={{ fontWeight: 700 }}>{doc.name}</td>
+                <td style={{ color: 'var(--secondary-text)' }}>{doc.objectName}</td>
+                <td style={{ color: 'var(--secondary-text)', fontSize: 13 }}>{doc.familyMember}</td>
                 <td><StatusBadge status={doc.status} /></td>
-                <td style={{ color: 'var(--gray-500)', fontSize: 12, whiteSpace: 'nowrap' }}>{doc.date}</td>
-                <td style={{ fontSize: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <td style={{ color: 'var(--gray-500)', fontSize: 13, whiteSpace: 'nowrap' }}>{doc.date}</td>
+                <td style={{ fontSize: 13 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div
-                      className="avatar avatar-sm"
+                      className="avatar"
                       style={{
-                        background: '#7c5cbf',
-                        width: 22,
-                        height: 22,
+                        width: 24,
+                        height: 24,
                         fontSize: 9,
+                        background: 'var(--avatar-bg)',
+                        color: 'var(--avatar-text)',
                       }}
                     >
                       {doc.assignedTo.split(' ').map(w => w[0]).join('').slice(0, 2)}
                     </div>
-                    {doc.assignedTo}
+                    <span>{doc.assignedTo}</span>
                   </div>
                 </td>
                 <td>
@@ -114,7 +123,7 @@ export default function DocumentsPage() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center', padding: 40, color: 'var(--gray-400)' }}>
+                <td colSpan={7} style={{ textAlign: 'center', padding: 48, color: 'var(--gray-400)', fontSize: 14 }}>
                   No documents match this filter.
                 </td>
               </tr>

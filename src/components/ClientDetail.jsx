@@ -20,11 +20,11 @@ function StatusBadge({ status }) {
 
 export default function ClientDetail({ clientId, onBack }) {
   const [newNote, setNewNote] = useState('');
-  const [notes, setNotes] = useState(null);
+  const [extraNotes, setExtraNotes] = useState([]);
 
-  // Try to find detailed record, fall back to clients list
   const detail = clientDetails[clientId];
   const basicClient = clients.find(c => c.id === clientId);
+
   const client = detail || (basicClient ? {
     id: basicClient.id,
     firstName: basicClient.firstName,
@@ -32,7 +32,7 @@ export default function ClientDetail({ clientId, onBack }) {
     program: basicClient.program,
     caseWorker: 'CW Close',
     familyMembers: [
-      { name: `${basicClient.firstName} ${basicClient.lastName}`, initials: `${basicClient.firstName[0]}${basicClient.lastName[0]}`, color: '#7c5cbf' },
+      { name: `${basicClient.firstName} ${basicClient.lastName}`, initials: `${basicClient.firstName[0]}${basicClient.lastName[0]}` },
     ],
     programs: [
       { name: basicClient.program, docCount: 3, thumb: null },
@@ -48,32 +48,32 @@ export default function ClientDetail({ clientId, onBack }) {
     ],
   } : null);
 
-  const displayNotes = notes || (client ? client.notes : []);
-
   if (!client) {
     return (
       <div className="page">
-        <div style={{ textAlign: 'center', padding: 60, color: 'var(--gray-400)' }}>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--gray-400)', fontSize: 16 }}>
           Client not found.
         </div>
       </div>
     );
   }
 
+  const allNotes = [...(client.notes || []), ...extraNotes];
+  const fullName = `${client.firstName} ${client.lastName}`;
+
   function addNote() {
     if (!newNote.trim()) return;
     const now = new Date();
-    const timestamp = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${String(now.getFullYear()).slice(2)} ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
-    setNotes([...(displayNotes), {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dateStr = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+    setExtraNotes(prev => [...prev, {
       id: Date.now(),
       text: newNote.trim(),
-      timestamp,
+      date: dateStr,
       author: 'Jordan Reyes',
     }]);
     setNewNote('');
   }
-
-  const fullName = `${client.firstName} ${client.lastName}`;
 
   return (
     <div className="page">
@@ -88,30 +88,33 @@ export default function ClientDetail({ clientId, onBack }) {
       <div className="client-header">
         <h1>{fullName}</h1>
         <span style={{
-          background: 'var(--gray-100)',
-          border: '1px solid var(--card-border)',
+          background: 'var(--blue-light)',
+          border: '1px solid #c5d8f5',
           borderRadius: 20,
-          padding: '3px 12px',
-          fontSize: 12,
+          padding: '4px 14px',
+          fontSize: 13,
           fontWeight: 600,
-          color: 'var(--gray-600)',
+          color: 'var(--secondary-text)',
+          fontFamily: 'Public Sans, sans-serif',
         }}>
           {client.caseWorker}
         </span>
         <div style={{ marginLeft: 'auto' }}>
-          <button className="btn btn-ghost btn-sm">
+          <button className="btn btn-outline btn-sm">
             Edit client
           </button>
         </div>
       </div>
 
       {/* Family members */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', marginBottom: 8 }}>Family members:</div>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--gray-500)', marginBottom: 8, fontFamily: 'Public Sans, sans-serif' }}>
+          Family members:
+        </div>
         <div className="family-chips">
           {client.familyMembers.map(member => (
             <div key={member.name} className="family-chip">
-              <div className="avatar avatar-sm" style={{ background: member.color, width: 24, height: 24, fontSize: 10 }}>
+              <div className="avatar avatar-sm">
                 {member.initials}
               </div>
               {member.name}
@@ -120,7 +123,7 @@ export default function ClientDetail({ clientId, onBack }) {
         </div>
       </div>
 
-      {/* Two-column main layout */}
+      {/* Two-column layout */}
       <div className="client-detail-layout">
         {/* Left column */}
         <div>
@@ -140,7 +143,7 @@ export default function ClientDetail({ clientId, onBack }) {
           </div>
 
           {/* Document Checklist */}
-          <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card" style={{ marginBottom: 20 }}>
             <div className="card-header">
               <h3>My Document Checklist</h3>
             </div>
@@ -157,20 +160,20 @@ export default function ClientDetail({ clientId, onBack }) {
               <tbody>
                 {client.checklist.map((row, i) => (
                   <tr key={i}>
-                    <td style={{ fontWeight: 500 }}>{row.familyMember}</td>
+                    <td style={{ fontWeight: 700 }}>{row.familyMember}</td>
                     <td><StatusBadge status={row.status} /></td>
-                    <td style={{ color: 'var(--gray-600)' }}>{row.count}</td>
+                    <td style={{ color: 'var(--gray-500)' }}>{row.count}</td>
                     <td>
                       <button className="btn btn-ghost btn-sm">{row.action}</button>
                     </td>
                     <td>
                       {row.reupload ? (
-                        <button className="btn btn-sm" style={{ background: 'var(--amber-light)', color: 'var(--amber)' }}>
+                        <button className="btn btn-sm" style={{ background: 'var(--amber-light)', color: 'var(--amber)', border: 'none' }}>
                           <Icon name="upload" size={12} />
                           Reupload
                         </button>
                       ) : (
-                        <span style={{ color: 'var(--gray-400)', fontSize: 12 }}>—</span>
+                        <span style={{ color: 'var(--gray-400)', fontSize: 13 }}>—</span>
                       )}
                     </td>
                   </tr>
@@ -179,29 +182,29 @@ export default function ClientDetail({ clientId, onBack }) {
             </table>
           </div>
 
-          {/* Eligibility Checklist */}
+          {/* Eligibility Appointment Checklist */}
           <div className="card">
             <div className="card-header">
               <h3>Eligibility Appointment Checklist</h3>
             </div>
-            <div style={{ padding: '0 18px' }}>
+            <div style={{ padding: '0 20px' }}>
               {client.eligibilityDocs.map((doc, i) => (
                 <div key={i} className="elig-item">
                   <span style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: 3,
-                    background: doc.uploaded >= doc.required ? 'var(--green)' : 'var(--card-border)',
+                    width: 18,
+                    height: 18,
+                    borderRadius: 4,
+                    background: doc.uploaded >= doc.required ? 'var(--green-trend)' : 'var(--card-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
                   }}>
                     {doc.uploaded >= doc.required && (
-                      <Icon name="check" size={10} color="#fff" strokeWidth={3} />
+                      <Icon name="check" size={11} color="#fff" strokeWidth={3} />
                     )}
                   </span>
-                  <span style={{ flex: 1 }}>{doc.label}</span>
+                  <span style={{ flex: 1, fontSize: 14, fontFamily: 'Public Sans, sans-serif' }}>{doc.label}</span>
                   <span className="elig-count">{doc.uploaded}/{doc.required}</span>
                 </div>
               ))}
@@ -209,41 +212,32 @@ export default function ClientDetail({ clientId, onBack }) {
           </div>
         </div>
 
-        {/* Right panel: Notice to Client */}
+        {/* Right column: Notice to Client */}
         <div>
           <div className="card">
             <div className="card-header">
               <h3>Notice to Client</h3>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => {
-                  const note = prompt('Add note:');
-                  if (note && note.trim()) {
-                    const now = new Date();
-                    const timestamp = `${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')}/${String(now.getFullYear()).slice(2)} ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
-                    setNotes([...(displayNotes), { id: Date.now(), text: note.trim(), timestamp, author: 'Jordan Reyes' }]);
-                  }
-                }}
-              >
-                <Icon name="plus" size={13} />
-                Add note
-              </button>
             </div>
-            <div style={{ padding: '14px 18px' }}>
-              {displayNotes.length === 0 && (
-                <div style={{ fontSize: 13, color: 'var(--gray-400)', textAlign: 'center', padding: '20px 0' }}>
+
+            <div style={{ padding: '0 20px 20px' }}>
+              {allNotes.length === 0 ? (
+                <div style={{ fontSize: 14, color: 'var(--gray-400)', textAlign: 'center', padding: '24px 0' }}>
                   No notes yet.
                 </div>
+              ) : (
+                allNotes.map(note => (
+                  <div key={note.id} className="note-item">
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
+                      <span className="note-author">{note.author}</span>
+                      <span className="note-date">{note.date}</span>
+                    </div>
+                    <div className="note-text">{note.text}</div>
+                  </div>
+                ))
               )}
-              {displayNotes.map(note => (
-                <div key={note.id} className="note-item">
-                  <div className="note-text">{note.text}</div>
-                  <div className="note-meta">{note.timestamp} · {note.author}</div>
-                </div>
-              ))}
 
-              {/* Inline add note */}
-              <div style={{ marginTop: 12 }}>
+              {/* Add note inline */}
+              <div style={{ marginTop: 16 }}>
                 <textarea
                   value={newNote}
                   onChange={e => setNewNote(e.target.value)}
@@ -251,26 +245,28 @@ export default function ClientDetail({ clientId, onBack }) {
                   style={{
                     width: '100%',
                     border: '1px solid var(--card-border)',
-                    borderRadius: 7,
-                    padding: '8px 10px',
-                    fontSize: 13,
-                    fontFamily: 'inherit',
+                    borderRadius: 6,
+                    padding: '10px 12px',
+                    fontSize: 14,
+                    fontFamily: 'Public Sans, sans-serif',
                     resize: 'vertical',
-                    minHeight: 72,
+                    minHeight: 80,
                     outline: 'none',
-                    color: 'var(--gray-800)',
+                    color: 'var(--body-text)',
                   }}
                   onFocus={e => e.target.style.borderColor = 'var(--blue)'}
                   onBlur={e => e.target.style.borderColor = 'var(--card-border)'}
                 />
-                <button
-                  className="btn btn-primary btn-sm"
-                  style={{ marginTop: 8 }}
-                  onClick={addNote}
-                  disabled={!newNote.trim()}
-                >
-                  Save note
-                </button>
+                <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={addNote}
+                    disabled={!newNote.trim()}
+                  >
+                    <Icon name="plus" size={13} />
+                    Add note
+                  </button>
+                </div>
               </div>
             </div>
           </div>
