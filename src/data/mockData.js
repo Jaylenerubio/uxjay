@@ -92,7 +92,19 @@ export const clientDetails = {
 export const tasks = [];
 export const teamMembers = [];
 export const documents = [];
-export const notices = [];
+export const notices = [
+  { id: 1,  type: 'Eligibility Letter',  clientName: 'Maria Santos',     clientId: 'C-1042', program: 'Runaway Village Stage 1',           createdDate: '05/10/26', sentDate: null,      status: 'draft',        fileName: null,                          acknowledgedDate: null,   note: '' },
+  { id: 2,  type: 'Voucher',             clientName: 'Devon Williams',    clientId: 'C-0887', program: 'HFA San Isidro Affordable Housing', createdDate: '05/09/26', sentDate: '05/11/26', status: 'sent',         fileName: 'voucher-devon-williams.pdf',   acknowledgedDate: null,   note: '' },
+  { id: 3,  type: 'Appointment Slip',    clientName: 'Luz Ortega',        clientId: 'C-1105', program: 'Runaway Village Stage 1',           createdDate: '05/08/26', sentDate: '05/09/26', status: 'acknowledged', fileName: 'appt-luz-ortega.pdf',          acknowledgedDate: '05/12/26', note: 'Initial eligibility appointment at main office.' },
+  { id: 4,  type: 'Voucher',             clientName: 'Aisha Coleman',     clientId: 'C-1220', program: 'Family Stability Initiative',       createdDate: '05/07/26', sentDate: '05/08/26', status: 'sent',         fileName: 'voucher-aisha-coleman.pdf',    acknowledgedDate: null,   note: '' },
+  { id: 5,  type: 'Eligibility Letter',  clientName: 'Fatima Al-Hassan',  clientId: 'C-1455', program: 'Refugee Resettlement Program',      createdDate: '05/06/26', sentDate: '05/07/26', status: 'acknowledged', fileName: 'elig-fatima-alhassan.pdf',     acknowledgedDate: '05/10/26', note: 'Letter re: program eligibility determination.' },
+  { id: 6,  type: 'Appointment Slip',    clientName: 'Robert Tran',       clientId: 'C-0761', program: 'HFA San Isidro Affordable Housing', createdDate: '05/05/26', sentDate: null,      status: 'draft',        fileName: null,                          acknowledgedDate: null,   note: '' },
+  { id: 7,  type: 'Eligibility Letter',  clientName: 'Carmen Rivera',     clientId: 'C-1188', program: 'Runaway Village Stage 1',           createdDate: '05/04/26', sentDate: '05/05/26', status: 'sent',         fileName: 'elig-carmen-rivera.pdf',       acknowledgedDate: null,   note: 'Follow-up after document review.' },
+  { id: 8,  type: 'Voucher',             clientName: 'Priya Nair',        clientId: 'C-1301', program: 'Family Stability Initiative',       createdDate: '05/03/26', sentDate: '05/04/26', status: 'acknowledged', fileName: 'voucher-priya-nair.pdf',       acknowledgedDate: '05/08/26', note: '' },
+  { id: 9,  type: 'Appointment Slip',    clientName: 'Marcus Bell',       clientId: 'C-0590', program: 'Runaway Village Stage 2',           createdDate: '05/02/26', sentDate: '05/03/26', status: 'sent',         fileName: 'appt-marcus-bell.pdf',         acknowledgedDate: null,   note: 'Housing assessment appointment.' },
+  { id: 10, type: 'Eligibility Letter',  clientName: 'James Fitch',       clientId: 'C-0934', program: 'HFA San Isidro Affordable Housing', createdDate: '05/01/26', sentDate: null,      status: 'draft',        fileName: null,                          acknowledgedDate: null,   note: '' },
+];
+
 export const activity = [];
 export const docTypes = [];
 export const statusOptions = [];

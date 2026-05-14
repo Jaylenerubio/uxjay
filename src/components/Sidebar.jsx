@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { key: 'activity',  label: 'Activity',  icon: 'bell' },
   { key: 'clients',   label: 'Clients',   icon: 'group' },
   { key: 'documents', label: 'Documents', icon: 'documents' },
+  { key: 'notices',   label: 'Notices',   icon: 'mail' },
 ];
 
 export default function Sidebar({ active, onNav }) {

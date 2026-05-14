@@ -5,6 +5,7 @@ import ActivityPage from './components/ActivityPage';
 import ClientsPage from './components/ClientsPage';
 import DocumentsPage from './components/DocumentsPage';
 import ClientDetail from './components/ClientDetail';
+import NoticesPage from './components/NoticesPage';
 
 export default function App() {
   const [page, setPage] = useState('dashboard');
@@ -31,6 +32,7 @@ export default function App() {
       case 'activity':     return <ActivityPage />;
       case 'clients':      return <ClientsPage onClientSelect={handleClientSelect} />;
       case 'documents':    return <DocumentsPage />;
+      case 'notices':      return <NoticesPage />;
       case 'clientDetail': return <ClientDetail clientId={selectedClientId} onBack={handleBack} />;
       default:             return <Dashboard />;
     }

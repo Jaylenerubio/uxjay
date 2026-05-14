@@ -162,6 +162,36 @@ export function Icon({ name, size = 18, color = 'currentColor', strokeWidth = 1.
           <line x1="3" y1="18" x2="3.01" y2="18" />
         </svg>
       );
+    case 'mail':
+    case 'notices':
+      return (
+        <svg {...props}>
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+      );
+    case 'send':
+      return (
+        <svg {...props}>
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+      );
+    case 'x':
+    case 'close':
+      return (
+        <svg {...props}>
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      );
+    case 'user':
+      return (
+        <svg {...props}>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      );
     default:
       return null;
   }
