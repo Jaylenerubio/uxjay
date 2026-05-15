@@ -512,6 +512,13 @@ export default function NoticesPage() {
 
   return (
     <div className="page" style={{ paddingBottom: 40 }}>
+      <div style={{
+        background: '#004cbe', color: '#fff', padding: '8px 16px',
+        borderRadius: 8, fontSize: 13, fontWeight: 700, marginBottom: 20,
+        display: 'inline-block'
+      }}>
+        ✓ New Notices Page loaded — v2
+      </div>
       {toast && (
         <div style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
