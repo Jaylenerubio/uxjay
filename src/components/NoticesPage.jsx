@@ -464,26 +464,169 @@ function selectStyle(filled) {
   };
 }
 
+/* ── Status config ───────────────────────────────────────────────────────── */
+
+const STATUS_CONFIG = {
+  awaiting:     { dot: '#3b82f6', label: 'Awaiting acknowledgement', bg: '#eff6ff', text: '#1d4ed8' },
+  seen:         { dot: '#f59e0b', label: 'Seen — not yet acknowledged', bg: '#fffbeb', text: '#b45309' },
+  acknowledged: { dot: '#16a34a', label: 'Acknowledged', bg: '#f0fdf4', text: '#15803d' },
+};
+
+function StatusPill({ status }) {
+  const c = STATUS_CONFIG[status];
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      background: c.bg, color: c.text,
+      fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20,
+      whiteSpace: 'nowrap',
+    }}>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.dot, flexShrink: 0 }} />
+      {c.label}
+    </span>
+  );
+}
+
+const TYPE_ICON = {
+  'Appointment letter': '📅',
+  'Shopping voucher':   '🛒',
+  'Fair-hearing slip':  '⚖️',
+  'Eligibility decision': '📋',
+  'Next steps letter':  '➡️',
+  'Housing voucher':    '🏠',
+};
+
+/* ── Notice row ─────────────────────────────────────────────────────────── */
+
+function NoticeRow({ notice, onRemind }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div
+      style={{
+        borderBottom: '1px solid #f3f4f6',
+        transition: 'background 0.1s',
+      }}
+    >
+      {/* Main row */}
+      <div
+        onClick={() => setExpanded(e => !e)}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '28px 1fr 160px 140px 90px 80px',
+          alignItems: 'center',
+          gap: 12, padding: '12px 18px',
+          cursor: 'pointer',
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+        onMouseLeave={e => e.currentTarget.style.background = ''}
+      >
+        {/* Type icon */}
+        <span style={{ fontSize: 16, lineHeight: 1 }}>{TYPE_ICON[notice.type] || '📄'}</span>
+
+        {/* Client + type */}
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 600, fontSize: 13, color: '#1a1a1a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {notice.clientName}
+            <span style={{ fontWeight: 400, color: '#9ca3af', marginLeft: 6, fontSize: 12 }}>{notice.clientId}</span>
+          </div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginTop: 1, textTransform: 'capitalize' }}>{notice.type}</div>
+        </div>
+
+        {/* Status */}
+        <div><StatusPill status={notice.status} /></div>
+
+        {/* Sender */}
+        <div style={{ fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {notice.sender}
+        </div>
+
+        {/* Date */}
+        <div style={{ fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>{notice.sentDate}</div>
+
+        {/* Action */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          {notice.status !== 'acknowledged' ? (
+            <button
+              onClick={e => { e.stopPropagation(); onRemind(notice.id); }}
+              style={{
+                fontSize: 11, fontWeight: 600, color: '#004cbe',
+                background: '#eff6ff', border: 'none', borderRadius: 6,
+                padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              Remind
+            </button>
+          ) : (
+            <span style={{ fontSize: 11, color: '#9ca3af' }}>✓ Done</span>
+          )}
+        </div>
+      </div>
+
+      {/* Expanded message */}
+      {expanded && (
+        <div style={{
+          padding: '0 18px 14px',
+          paddingLeft: 58,
+          fontSize: 13, color: '#6b7280', lineHeight: 1.6,
+          background: '#fafafa',
+          borderTop: '1px solid #f3f4f6',
+        }}>
+          {notice.message}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Group rows by date label ────────────────────────────────────────────── */
+
+function groupByDate(notices) {
+  const today = ['05/14/26', '05/13/26'];
+  const thisWeek = ['05/12/26', '05/11/26', '05/10/26', '05/09/26', '05/08/26'];
+  const groups = [];
+  const buckets = { 'Today': [], 'This week': [], 'Earlier': [] };
+  notices.forEach(n => {
+    if (today.includes(n.sentDate)) buckets['Today'].push(n);
+    else if (thisWeek.includes(n.sentDate)) buckets['This week'].push(n);
+    else buckets['Earlier'].push(n);
+  });
+  ['Today', 'This week', 'Earlier'].forEach(label => {
+    if (buckets[label].length > 0) groups.push({ label, items: buckets[label] });
+  });
+  return groups;
+}
+
 /* ── Main page ───────────────────────────────────────────────────────────── */
 
 export default function NoticesPage() {
   const [notices, setNotices] = useState(INITIAL_NOTICES);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('All types');
+  const [search, setSearch] = useState('');
   const [showSheet, setShowSheet] = useState(false);
   const [toast, setToast] = useState(null);
 
-  const TYPE_FILTER_OPTS = ['All types', ...NOTICE_TYPES];
+  const filtered = notices.filter(n => {
+    const matchStatus = statusFilter === 'all' || n.status === statusFilter;
+    const matchType = typeFilter === 'All types' || n.type === typeFilter;
+    const q = search.toLowerCase();
+    const matchSearch = !q || n.clientName.toLowerCase().includes(q) || n.type.toLowerCase().includes(q) || n.clientId.toLowerCase().includes(q);
+    return matchStatus && matchType && matchSearch;
+  });
 
-  const filtered = notices.filter(n =>
-    typeFilter === 'All types' || n.type === typeFilter
-  );
+  const total = notices.length;
+  const counts = {
+    awaiting: notices.filter(n => n.status === 'awaiting').length,
+    seen: notices.filter(n => n.status === 'seen').length,
+    acknowledged: notices.filter(n => n.status === 'acknowledged').length,
+  };
 
   function handleRemind(id) {
     const n = notices.find(x => x.id === id);
     showToast(`Reminder sent to ${n.clientName}.`);
   }
 
-  function handleSend({ noticeType, clientId, comments, fileNames }) {
+  function handleSend({ noticeType, clientId, comments }) {
     const client = clients.find(c => c.id === clientId);
     setNotices(prev => [{
       id: Date.now(),
@@ -504,21 +647,17 @@ export default function NoticesPage() {
     setTimeout(() => setToast(null), 3000);
   }
 
-  const counts = {
-    awaiting: filtered.filter(n => n.status === 'awaiting').length,
-    seen: filtered.filter(n => n.status === 'seen').length,
-    acknowledged: filtered.filter(n => n.status === 'acknowledged').length,
-  };
+  const groups = groupByDate(filtered);
+
+  const STATUS_TABS = [
+    { key: 'all',         label: 'All notices',   count: total },
+    { key: 'awaiting',    label: 'Awaiting',       count: counts.awaiting },
+    { key: 'seen',        label: 'Seen',           count: counts.seen },
+    { key: 'acknowledged',label: 'Acknowledged',   count: counts.acknowledged },
+  ];
 
   return (
     <div className="page" style={{ paddingBottom: 40 }}>
-      <div style={{
-        background: '#004cbe', color: '#fff', padding: '8px 16px',
-        borderRadius: 8, fontSize: 13, fontWeight: 700, marginBottom: 20,
-        display: 'inline-block'
-      }}>
-        ✓ New Notices Page loaded — v2
-      </div>
       {toast && (
         <div style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
@@ -529,16 +668,13 @@ export default function NoticesPage() {
       )}
 
       {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, gap: 16 }}>
         <div>
-          <h1 style={{
-            fontFamily: "'Source Serif 4', serif", fontSize: 34, fontWeight: 700,
-            color: '#1a1a1a', lineHeight: 1.15, marginBottom: 6,
-          }}>
+          <h1 style={{ fontFamily: "'Source Serif 4', serif", fontSize: 34, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.15, marginBottom: 4 }}>
             Notices
           </h1>
-          <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.5, maxWidth: 440 }}>
-            Send vouchers, appointment letters, fair-hearing slips, and eligibility decisions to clients in their housing journey.
+          <p style={{ fontSize: 14, color: '#6b7280' }}>
+            {total} total · {counts.awaiting} awaiting · {counts.seen} seen · {counts.acknowledged} acknowledged
           </p>
         </div>
         <button
@@ -547,77 +683,126 @@ export default function NoticesPage() {
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '10px 20px', background: '#031553', color: '#fff',
             border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 700,
-            cursor: 'pointer', fontFamily: "'Public Sans', sans-serif",
-            flexShrink: 0, whiteSpace: 'nowrap',
+            cursor: 'pointer', fontFamily: "'Public Sans', sans-serif", flexShrink: 0,
           }}
         >
           <Icon name="send" size={14} color="#fff" /> Send notice
         </button>
       </div>
 
-      {/* Filters */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-        {TYPE_FILTER_OPTS.map(t => (
-          <button
-            key={t}
-            onClick={() => setTypeFilter(t)}
+      {/* Progress bar — at a glance how many acknowledged */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 8, background: '#f3f4f6', gap: 2 }}>
+          <div style={{ width: `${(counts.acknowledged / total) * 100}%`, background: '#16a34a', borderRadius: '8px 0 0 8px', transition: 'width 0.4s' }} />
+          <div style={{ width: `${(counts.seen / total) * 100}%`, background: '#f59e0b', transition: 'width 0.4s' }} />
+          <div style={{ width: `${(counts.awaiting / total) * 100}%`, background: '#3b82f6', borderRadius: '0 8px 8px 0', transition: 'width 0.4s' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 16, marginTop: 6 }}>
+          {[
+            { color: '#16a34a', label: `${counts.acknowledged} acknowledged` },
+            { color: '#f59e0b', label: `${counts.seen} seen` },
+            { color: '#3b82f6', label: `${counts.awaiting} awaiting` },
+          ].map(({ color, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#6b7280' }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+              {label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Toolbar */}
+      <div style={{
+        background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px 10px 0 0',
+        borderBottom: 'none', padding: '12px 18px',
+        display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap',
+      }}>
+        {/* Status tabs */}
+        <div style={{ display: 'flex', gap: 2, background: '#f3f4f6', borderRadius: 8, padding: 3 }}>
+          {STATUS_TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              style={{
+                padding: '5px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit', border: 'none',
+                background: statusFilter === tab.key ? '#fff' : 'transparent',
+                color: statusFilter === tab.key ? '#1a1a1a' : '#6b7280',
+                boxShadow: statusFilter === tab.key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.1s',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {tab.label} <span style={{ color: statusFilter === tab.key ? '#004cbe' : '#9ca3af', marginLeft: 2 }}>{tab.count}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Type filter */}
+        <select
+          value={typeFilter}
+          onChange={e => setTypeFilter(e.target.value)}
+          style={{
+            fontSize: 12, padding: '6px 10px', border: '1px solid #e5e7eb',
+            borderRadius: 6, outline: 'none', background: '#fff', color: '#374151',
+            fontFamily: 'inherit', cursor: 'pointer',
+          }}
+        >
+          {['All types', ...NOTICE_TYPES].map(t => <option key={t}>{t}</option>)}
+        </select>
+
+        {/* Search */}
+        <div style={{ marginLeft: 'auto', position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <span style={{ position: 'absolute', left: 9, color: '#9ca3af', pointerEvents: 'none', display: 'flex' }}>
+            <Icon name="search" size={13} />
+          </span>
+          <input
+            type="text"
+            placeholder="Search client or notice type..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
             style={{
-              padding: '5px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600,
-              cursor: 'pointer', fontFamily: "'Public Sans', sans-serif",
-              background: typeFilter === t ? '#004cbe' : 'transparent',
-              color: typeFilter === t ? '#fff' : '#374151',
-              border: typeFilter === t ? 'none' : '1.5px solid #d1d5db',
-              textTransform: 'capitalize',
+              padding: '6px 10px 6px 28px', fontSize: 12, fontFamily: 'inherit',
+              border: '1px solid #e5e7eb', borderRadius: 6, outline: 'none', width: 220,
             }}
-          >
-            {t}
-          </button>
+          />
+        </div>
+        <span style={{ fontSize: 11, color: '#9ca3af' }}>{filtered.length} notices</span>
+      </div>
+
+      {/* Column headers */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: '28px 1fr 160px 140px 90px 80px',
+        gap: 12, padding: '8px 18px',
+        background: '#f9fafb', border: '1px solid #e5e7eb', borderBottom: 'none',
+      }}>
+        {['', 'Client / Type', 'Status', 'Sent by', 'Date', ''].map((h, i) => (
+          <div key={i} style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#9ca3af' }}>{h}</div>
         ))}
       </div>
 
-      {/* Kanban columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, alignItems: 'start' }}>
-        {COLS.map(col => {
-          const colNotices = filtered.filter(n => n.status === col.key);
-          return (
-            <div key={col.key}>
-              {/* Column header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{
-                  width: 8, height: 8, borderRadius: '50%',
-                  background: col.dotColor, flexShrink: 0,
-                }} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', flex: 1 }}>
-                  {col.label}
-                </span>
-                <span style={{
-                  fontSize: 11, fontWeight: 700, color: col.dotColor,
-                  background: col.dotColor + '18',
-                  padding: '1px 8px', borderRadius: 20,
-                }}>
-                  {counts[col.key]}
-                </span>
+      {/* Grouped rows */}
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '0 0 10px 10px', overflow: 'hidden' }}>
+        {filtered.length === 0 ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
+            No notices match your filters.
+          </div>
+        ) : (
+          groups.map(group => (
+            <div key={group.label}>
+              <div style={{
+                padding: '7px 18px', background: '#f9fafb',
+                borderTop: '1px solid #f3f4f6', borderBottom: '1px solid #f3f4f6',
+                fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.6px',
+              }}>
+                {group.label} · {group.items.length}
               </div>
-
-              {/* Cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {colNotices.length === 0 ? (
-                  <div style={{
-                    padding: '24px 16px', textAlign: 'center',
-                    border: '1.5px dashed #e5e7eb', borderRadius: 8,
-                    fontSize: 12, color: '#9ca3af',
-                  }}>
-                    No notices
-                  </div>
-                ) : (
-                  colNotices.map(n => (
-                    <NoticeCard key={n.id} notice={n} col={col} onRemind={handleRemind} />
-                  ))
-                )}
-              </div>
+              {group.items.map(n => (
+                <NoticeRow key={n.id} notice={n} onRemind={handleRemind} />
+              ))}
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
 
       {/* Side sheet */}
@@ -627,3 +812,4 @@ export default function NoticesPage() {
     </div>
   );
 }
+
