@@ -1,49 +1,36 @@
 import { useState } from 'react';
-import Sidebar from './components/Sidebar';
-import Dashboard from './components/Dashboard';
-import ActivityPage from './components/ActivityPage';
-import ClientsPage from './components/ClientsPage';
-import DocumentsPage from './components/DocumentsPage';
-import ClientDetail from './components/ClientDetail';
-import NoticesPage from './components/NoticesPage';
+import Nav from './components/Nav';
+import HomePage from './components/HomePage';
+import CaseStudyPage from './components/CaseStudyPage';
 
 export default function App() {
-  const [page, setPage] = useState('dashboard');
-  const [selectedClientId, setSelectedClientId] = useState(null);
+  const [page, setPage] = useState('home');
+  const [selectedCase, setSelectedCase] = useState(null);
 
-  function handleNav(key) {
-    setPage(key);
-    if (key !== 'clientDetail') setSelectedClientId(null);
+  function openCaseStudy(id) {
+    setSelectedCase(id);
+    setPage('case-study');
+    window.scrollTo({ top: 0 });
   }
 
-  function handleClientSelect(clientId) {
-    setSelectedClientId(clientId);
-    setPage('clientDetail');
-  }
-
-  function handleBack() {
-    setPage('clients');
-    setSelectedClientId(null);
-  }
-
-  function renderPage() {
-    switch (page) {
-      case 'dashboard':    return <Dashboard />;
-      case 'activity':     return <ActivityPage />;
-      case 'clients':      return <ClientsPage onClientSelect={handleClientSelect} />;
-      case 'documents':    return <DocumentsPage />;
-      case 'notices':      return <NoticesPage />;
-      case 'clientDetail': return <ClientDetail clientId={selectedClientId} onBack={handleBack} />;
-      default:             return <Dashboard />;
+  function goHome(anchor) {
+    setPage('home');
+    setSelectedCase(null);
+    if (anchor) {
+      setTimeout(() => {
+        const el = document.getElementById(anchor);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+    } else {
+      window.scrollTo({ top: 0 });
     }
   }
 
   return (
-    <div className="layout">
-      <Sidebar active={page === 'clientDetail' ? 'clients' : page} onNav={handleNav} />
-      <div className="main-content">
-        {renderPage()}
-      </div>
+    <div>
+      <Nav onHome={() => goHome()} onWork={() => goHome('work')} onAbout={() => goHome('about')} currentPage={page} />
+      {page === 'home'       && <HomePage onCaseStudy={openCaseStudy} />}
+      {page === 'case-study' && <CaseStudyPage id={selectedCase} onBack={() => goHome('work')} onCaseStudy={openCaseStudy} />}
     </div>
   );
 }
