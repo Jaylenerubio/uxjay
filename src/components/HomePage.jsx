@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { caseStudies, about } from '../data/portfolioData';
 
 function useScrollReveal() {
@@ -38,47 +38,102 @@ function AnimBlock({ children, delay = 0, className = '' }) {
   );
 }
 
+function Typewriter({ text, speed = 70, startDelay = 500 }) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    const start = setTimeout(() => {
+      const timer = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) { clearInterval(timer); setDone(true); }
+      }, speed);
+      return () => clearInterval(timer);
+    }, startDelay);
+    return () => clearTimeout(start);
+  }, [text, speed, startDelay]);
+
+  return (
+    <span>
+      {displayed}
+      {!done && <span className="typewriter-cursor" />}
+    </span>
+  );
+}
+
+function pronounceName() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance('Jay-leen Roo-bee-oh');
+  u.rate = 0.75;
+  u.pitch = 1.0;
+  window.speechSynthesis.speak(u);
+}
+
 function HeroSection() {
   return (
     <section className="hero canvas-bg">
-      {/* Floating decorative FigJam elements */}
       <div className="hero-floaters">
-        <div className="floater floater-1">
-          <div className="sticky sticky-yellow" style={{ fontSize: 16, padding: '14px 18px' }}>
-            Currently @ NYC Mayor's Office 🏙️
+        {/* FigJam cursor */}
+        <div className="floater" style={{ top: '54%', right: '36%', animation: 'float2 7s ease-in-out infinite 1s' }}>
+          <div className="figjam-cursor-group">
+            <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+              <path d="M2 2L15.5 10.5L9.5 12L6.5 19L2 2Z" fill="#6B7AFF" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+            </svg>
+            <div className="figjam-cursor-name">Jaylene Rubio</div>
           </div>
         </div>
-        <div className="floater floater-2">
-          <div className="sticky sticky-coral" style={{ fontSize: 15, padding: '12px 16px', maxWidth: 160 }}>
-            2M+ New Yorkers impacted
+
+        {/* Sticky 1 — lavender */}
+        <div className="floater floater-1" style={{ top: '10%', right: '7%' }}>
+          <div className="sticky-with-sig sticky-lavender2">
+            <div className="sticky-msg">Currently @ NYC Mayor's Office for Economic Opportunity 🏙️</div>
+            <div className="sticky-sig">Jaylene Rubio</div>
           </div>
         </div>
-        <div className="floater floater-3">
-          <div className="cursor-label cursor-label-green">Available for new roles</div>
-        </div>
-        <div className="floater floater-4">
-          <span className="annotation" style={{ fontSize: 16 }}>
-            <span className="annotation-arrow">↑</span>
-            civic tech specialist
-          </span>
+
+        {/* Sticky 2 — periwinkle */}
+        <div className="floater floater-2" style={{ bottom: '22%', right: '5%' }}>
+          <div className="sticky-with-sig sticky-periwinkle">
+            <div className="sticky-msg">Want to leave me a sticky?<br />Click here!</div>
+            <div className="sticky-sig">Jaylene Rubio</div>
+          </div>
         </div>
       </div>
 
       <div className="hero-content">
-        <div className="hero-role-row" style={{ animation: 'fadeUp 0.6s ease forwards', opacity: 0 }}>
-          <span className="frame-label">Senior Product Designer</span>
-          <span className="cursor-label cursor-label-purple">NYC-based</span>
+        {/* Typewriter greeting */}
+        <div className="typewriter-wrap">
+          <Typewriter text="Hi, I'm Jaylene 👋" speed={70} startDelay={500} />
         </div>
 
-        <div className="hero-name" style={{ animation: 'fadeUp 0.65s 0.1s ease forwards', opacity: 0 }}>
-          <h1 className="display-xl">Jaylene<br />Rubio.</h1>
+        {/* Pronunciation */}
+        <div className="pronunciation-line">
+          <span className="pronunciation-phonetic">/ jay-LEEN /</span>
+          <button className="pronunciation-btn" onClick={pronounceName}>
+            🔊 hear my name
+          </button>
         </div>
 
-        <p
-          className="hero-sub"
-          style={{ animation: 'fadeUp 0.65s 0.2s ease forwards', opacity: 0 }}
-        >
-          I design city systems that actually work for the people who need them most. UX strategy, design systems, and civic tech — scaled to 2M+ New Yorkers.
+        {/* Heading with FigJam selection frame */}
+        <div className="figjam-selection mb-24">
+          <div className="sel-line sel-top" />
+          <div className="sel-line sel-right" />
+          <div className="sel-line sel-bottom" />
+          <div className="sel-line sel-left" />
+          <div className="sel-corner sel-tl" />
+          <div className="sel-corner sel-tr" />
+          <div className="sel-corner sel-bl" />
+          <div className="sel-corner sel-br" />
+          <h1 className="display-xl" style={{ animation: 'fadeUp 0.6s 0.1s ease forwards', opacity: 0 }}>
+            Sr. Product<br />Designer
+          </h1>
+        </div>
+
+        <p className="hero-sub" style={{ animation: 'fadeUp 0.65s 0.2s ease forwards', opacity: 0 }}>
+          Turning complex city systems into clear, human experiences for the millions who call New York City home.
         </p>
 
         <div className="hero-ctas" style={{ animation: 'fadeUp 0.65s 0.3s ease forwards', opacity: 0 }}>
@@ -88,7 +143,7 @@ function HeroSection() {
             View My Work ↓
           </button>
           <a className="btn btn-outline" href="mailto:jaylenerubio1@gmail.com">
-            Let's Talk →
+            Connect with me →
           </a>
         </div>
       </div>
