@@ -53,7 +53,7 @@ function restore(key, fallback) {
 function makeEnteringMap(notesList) {
   const dirs = ['top', 'right', 'bottom', 'left'];
   return Object.fromEntries(
-    notesList.map((n, i) => [n.id, { dir: dirs[i % 4], delay: i * 80 }])
+    notesList.map((n, i) => [n.id, { dir: dirs[i % 4], delay: i * 130 }])
   );
 }
 
