@@ -830,6 +830,15 @@ body {
   margin: 0 auto;
 }
 
+.cse-content-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  margin: 0 max(24px, 4vw) 20px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
 .cse-project-tag {
   font-family: var(--font-display);
   font-size: 12px;
@@ -1094,10 +1103,10 @@ body {
   left: 0;
   right: 0;
   z-index: 500;
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--card-border);
+  background: rgba(245,246,252,0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255,255,255,0.5);
   padding: 14px max(32px, 5vw);
   display: flex;
   align-items: center;

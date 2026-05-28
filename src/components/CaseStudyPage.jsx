@@ -27,7 +27,7 @@ export default function CaseStudyPage({ id, onBack, onCaseStudy }) {
   const nextCs = caseStudies[(caseStudies.findIndex(c => c.id === id) + 1) % caseStudies.length];
 
   return (
-    <div style={{ background: '#fafbff', minHeight: '100vh' }}>
+    <div className="canvas-bg" style={{ minHeight: '100vh', position: 'relative' }}>
 
       {/* ── Back bar ── */}
       <div className="cs-back-bar">
@@ -35,8 +35,27 @@ export default function CaseStudyPage({ id, onBack, onCaseStudy }) {
         <span className="cs-back-title">{cs.title}</span>
       </div>
 
+      {/* ── FigJam cursor ── */}
+      <div style={{
+        position: 'fixed',
+        bottom: 40,
+        right: 40,
+        zIndex: 400,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 3,
+        animation: 'float2 7s ease-in-out infinite',
+        pointerEvents: 'none'
+      }}>
+        <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+          <path d="M2 2L15.5 10.5L9.5 12L6.5 19L2 2Z" fill="#6B7AFF" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+        </svg>
+        <div className="figjam-cursor-name">Jaylene Rubio</div>
+      </div>
+
       {/* ── Hero ── */}
-      <div className="cse-hero">
+      <div className="cse-hero" style={{ background: 'transparent' }}>
         <AnimBlock>
           <div className="cse-project-tag" style={{ color: cs.accentColor }}>
             {cs.title.toUpperCase()} · {cs.role.toUpperCase()}
@@ -66,6 +85,9 @@ export default function CaseStudyPage({ id, onBack, onCaseStudy }) {
           </div>
         </AnimBlock>
       </div>
+
+      {/* ── Main content card ── */}
+      <div className="cse-content-card">
 
       {/* ── Product + Challenge ── */}
       <div className="cse-section cse-two-col">
@@ -170,6 +192,8 @@ export default function CaseStudyPage({ id, onBack, onCaseStudy }) {
           </blockquote>
         </AnimBlock>
       </div>
+
+      </div>{/* end content card */}
 
       {/* ── Next project ── */}
       <div className="cse-section cse-section-border">
