@@ -4,8 +4,7 @@ body { background: #FDFDFD; }
 
 /* ── Page ─────────────────────────────────────────────── */
 .fj-page {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -13,38 +12,23 @@ body { background: #FDFDFD; }
   user-select: none;
 }
 
-/* ── Top bar ──────────────────────────────────────────── */
-.fj-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background: rgba(253,253,253,0.94);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(0,0,0,0.07);
-  flex-shrink: 0;
-  z-index: 20;
-}
-.fj-topbar-left  { display: flex; align-items: center; gap: 10px; }
-.fj-topbar-right { display: flex; align-items: center; gap: 10px; }
-.fj-file-name { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: -0.01em; }
-.fj-note-count { font-size: 11px; color: #999; background: #f2f2f2; padding: 2px 8px; border-radius: 20px; }
-.fj-reset-link { font-size: 12px; font-family: 'Public Sans', sans-serif; color: #bbb; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: color 0.15s; }
-.fj-reset-link:hover { color: #555; }
-.fj-avatar { width: 30px; height: 30px; border-radius: 50%; background: #E4EFFF; color: #1C4ED8; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.fj-return-btn { font-family: 'Public Sans', sans-serif; font-size: 13px; font-weight: 600; background: #1a1a1a; color: #fff; border: none; border-radius: 20px; padding: 7px 16px; cursor: pointer; text-decoration: none; transition: background 0.15s, transform 0.1s; white-space: nowrap; }
-.fj-return-btn:hover  { background: #333; }
-.fj-return-btn:active { transform: scale(0.97); }
-
-/* ── Board ─────────────────────────────────────────────── */
+/* ── Board — fills full page, topbar floats above it ────────── */
 .fj-board {
-  flex: 1;
+  position: absolute;
+  inset: 0;
   overflow: auto;
   background-color: #FDFDFD;
   background-image: radial-gradient(circle, #DCDCDC 1.2px, transparent 1.2px);
   background-size: 24px 24px;
 }
 .fj-canvas { position: relative; width: 2400px; height: 1500px; }
+
+/* Hide system cursor on canvas objects when in select mode */
+.fj-board--select .sn-note    { cursor: none; }
+.fj-board--select .sn-sticker { cursor: none; }
+.sn-text   { cursor: text    !important; }
+.sn-author { cursor: text    !important; }
+.sn-delete { cursor: pointer !important; }
 
 .fj-canvas-text {
   position: absolute;
@@ -57,7 +41,6 @@ body { background: #FDFDFD; }
   user-select: none;
   letter-spacing: -0.03em;
 }
-
 .fj-canvas-hint {
   position: absolute;
   font-family: 'Inter', sans-serif;
@@ -68,6 +51,106 @@ body { background: #FDFDFD; }
   user-select: none;
   letter-spacing: -0.01em;
 }
+
+/* ── Top bar — transparent overlay ─────────────────────── */
+.fj-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: transparent;
+  pointer-events: none;
+}
+.fj-topbar > * { pointer-events: auto; }
+.fj-topbar-left  { display: flex; align-items: center; gap: 8px; }
+.fj-topbar-right { display: flex; align-items: center; gap: 10px; }
+
+/* Nav tool widget (cursor + hand) */
+.fj-nav-tools {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.09), 0 0 0 1px rgba(0,0,0,0.06);
+}
+.fj-nt-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  padding: 0;
+}
+.fj-nt-btn:hover  { background: rgba(0,0,0,0.05); color: #1a1a1a; }
+.fj-nt-btn.active { background: #7C3AED; color: #fff; }
+
+/* Board name pill */
+.fj-board-name-pill {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  letter-spacing: -0.01em;
+}
+
+.fj-reset-link {
+  font-size: 12px;
+  font-family: 'Public Sans', sans-serif;
+  color: #bbb;
+  background: rgba(255,255,255,0.85);
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s;
+  backdrop-filter: blur(4px);
+}
+.fj-reset-link:hover { color: #555; }
+.fj-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #4F46E5;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fj-return-btn {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.fj-return-btn:hover  { background: #333; }
+.fj-return-btn:active { transform: scale(0.97); }
 
 /* ── Sticky note ──────────────────────────────────────────── */
 .sn-note {
@@ -87,6 +170,49 @@ body { background: #FDFDFD; }
 .sn-note.selected .sn-delete { opacity: 1; }
 .sn-note.selected { outline: 2px solid #6366f1; outline-offset: 2px; }
 
+/* Mini toolbar — pops up above selected note */
+.sn-mini-toolbar {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+  white-space: nowrap;
+  z-index: 200;
+}
+.sn-mt-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: transform 0.12s, border-color 0.12s;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+.sn-mt-color:hover  { transform: scale(1.2); }
+.sn-mt-color.active { border-color: #1a1a1a; transform: scale(1.15); }
+.sn-mt-sep { width: 1px; height: 16px; background: rgba(0,0,0,0.1); margin: 0 2px; flex-shrink: 0; }
+.sn-mt-tape {
+  width: 28px;
+  height: 10px;
+  border-radius: 2px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: transform 0.12s, border-color 0.12s;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+.sn-mt-tape:hover  { transform: scaleY(1.4); }
+.sn-mt-tape.active { border-color: #1a1a1a; }
+
 .sn-tape {
   position: absolute;
   top: -11px;
@@ -98,7 +224,6 @@ body { background: #FDFDFD; }
   opacity: 0.85;
   pointer-events: none;
 }
-
 .sn-delete {
   position: absolute;
   top: 6px;
@@ -121,7 +246,6 @@ body { background: #FDFDFD; }
   z-index: 2;
 }
 .sn-delete:hover { background: rgba(200,40,40,0.18); color: #c00; }
-
 .sn-text {
   flex: 1;
   border: none;
@@ -138,7 +262,6 @@ body { background: #FDFDFD; }
   padding: 0;
 }
 .sn-text::placeholder { color: rgba(70,70,70,0.38); }
-
 .sn-footer {
   display: flex;
   align-items: center;
@@ -161,7 +284,7 @@ body { background: #FDFDFD; }
 }
 .sn-author::placeholder { color: rgba(80,80,80,0.3); }
 
-/* ── Sticker ───────────────────────────────────────────────── */
+/* ── Sticker ──────────────────────────────────────────────── */
 .sn-sticker {
   position: absolute;
   cursor: grab;
@@ -173,7 +296,7 @@ body { background: #FDFDFD; }
 .sn-sticker:active { cursor: grabbing; transform: scale(1.15); }
 .sn-sticker:hover  { transform: scale(1.1); }
 
-/* ── Sticker tray ──────────────────────────────────────────── */
+/* ── Sticker tray ─────────────────────────────────────────── */
 .fj-sticker-tray {
   position: fixed;
   bottom: 96px;
@@ -203,7 +326,7 @@ body { background: #FDFDFD; }
 .fj-sticker-btn:hover  { background: rgba(0,0,0,0.05); transform: scale(1.15); }
 .fj-sticker-btn.active { border-color: rgba(0,0,0,0.25); }
 
-/* ── Toolbar ─────────────────────────────────────────────── */
+/* ── Toolbar ────────────────────────────────────────────── */
 .fj-toolbar {
   position: fixed;
   bottom: 28px;
@@ -244,8 +367,8 @@ body { background: #FDFDFD; }
   color: rgba(0,0,0,0.3);
   line-height: 1;
 }
-.tb-row { display: flex; align-items: center; gap: 5px; }
-.tb-sep { width: 1px; height: 36px; background: rgba(0,0,0,0.08); flex-shrink: 0; }
+.tb-row  { display: flex; align-items: center; gap: 5px; }
+.tb-sep  { width: 1px; height: 36px; background: rgba(0,0,0,0.08); flex-shrink: 0; }
 .tb-color {
   width: 22px;
   height: 22px;
@@ -303,7 +426,6 @@ body { background: #FDFDFD; }
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  transform: translate(0, 0);
 }
 .fj-cursor-label {
   display: inline-block;
