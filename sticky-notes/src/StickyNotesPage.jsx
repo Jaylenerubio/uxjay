@@ -22,8 +22,7 @@ const TAPE_STYLES = [
 ];
 
 const STICKERS = ['🌟','🎉','❤️','🔥','✨','👏','🎨','💡','🚀','🌈','😊','💪','🙌','💐','🦋','⚡','🎯','🏆'];
-
-const CURSOR_COLORS = ['#7C3AED', '#DB2777', '#2563EB', '#059669', '#D97706', '#DC2626'];
+const CURSOR_COLORS = ['#7C3AED','#DB2777','#2563EB','#059669','#D97706','#DC2626'];
 
 const SEED_NOTES = [
   { id: 's1', x: 560,  y: 110, text: 'Friends — still the best comfort show ever made 💛', author: 'Mia T.',   color: 'yellow', tape: 'clear',  rotation: -2.5, zIndex: 1 },
@@ -35,7 +34,6 @@ const SEED_NOTES = [
   { id: 's7', x: 760,  y: 490, text: 'Abbott Elementary 🍎 — the best comedy on TV right now!', author: 'Dana L.', color: 'yellow', tape: 'blush',  rotation: -1.0, zIndex: 7 },
   { id: 's8', x: 480,  y: 500, text: 'Movie: Everything Everywhere All at Once 🌌 Changed me forever.', author: 'Chris',    color: 'blue',   tape: 'forest', rotation:  2.0, zIndex: 8 },
 ];
-
 const SEED_STICKERS = [
   { id: 'ss1', x: 820,  y: 255, emoji: '✨', size: 36 },
   { id: 'ss2', x: 1210, y: 115, emoji: '🎨', size: 32 },
@@ -51,6 +49,23 @@ function restore(key, fallback) {
   return fallback;
 }
 
+// ─── Tooltip ─────────────────────────────────────────────────────────────────
+function Tooltip({ label, shortcut, children }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="fj-tt-wrap" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      {children}
+      {show && (
+        <div className="fj-tt" role="tooltip">
+          {label}
+          {shortcut && <kbd className="fj-tt-key">{shortcut}</kbd>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 function CursorIcon() {
   return (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 3l14 9-7 1-4 7z" /></svg>);
 }
@@ -71,22 +86,17 @@ function StickerIcon() {
   return (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>);
 }
 
+// ─── Sticky Note ──────────────────────────────────────────────────────────────
 function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDragStart, autoFocus }) {
   const colorObj = NOTE_COLORS.find(c => c.id === note.color) || NOTE_COLORS[0];
   const tapeCss  = (TAPE_STYLES.find(t => t.id === note.tape) || TAPE_STYLES[0]).css;
   const taRef    = useRef(null);
-
   useEffect(() => { if (autoFocus && taRef.current) taRef.current.focus(); }, [autoFocus]);
-
   return (
     <div
       className={`sn-note${isSelected ? ' selected' : ''}`}
       style={{ left: note.x, top: note.y, background: colorObj.bg, transform: `rotate(${note.rotation}deg)`, zIndex: note.zIndex || 1 }}
-      onMouseDown={(e) => {
-        if (mode === 'pan') return;
-        onSelect(note.id);
-        onDragStart(e, note.id);
-      }}
+      onMouseDown={(e) => { if (mode === 'pan') return; onSelect(note.id); onDragStart(e, note.id); }}
     >
       {isSelected && (
         <div
@@ -122,6 +132,7 @@ function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDr
   );
 }
 
+// ─── Sticker ──────────────────────────────────────────────────────────────────
 function Sticker({ sticker, onDragStart, onDelete }) {
   return (
     <div className="sn-sticker"
@@ -134,6 +145,7 @@ function Sticker({ sticker, onDragStart, onDelete }) {
   );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function StickyNotesPage() {
   const [notes,         setNotes]         = useState(() => restore(LS_NOTES,    SEED_NOTES));
   const [stickers,      setStickers]      = useState(() => restore(LS_STICKERS, SEED_STICKERS));
@@ -165,13 +177,12 @@ export default function StickyNotesPage() {
   useEffect(() => { persist(LS_NOTES,    notes);    }, [notes]);
   useEffect(() => { persist(LS_STICKERS, stickers); }, [stickers]);
 
+  // Global drag / pan
   useEffect(() => {
     function onMove(e) {
       if (panning.current) {
-        const dx = e.clientX - panning.current.startX;
-        const dy = e.clientY - panning.current.startY;
-        boardRef.current.scrollLeft = panning.current.origLeft - dx;
-        boardRef.current.scrollTop  = panning.current.origTop  - dy;
+        boardRef.current.scrollLeft = panning.current.origLeft - (e.clientX - panning.current.startX);
+        boardRef.current.scrollTop  = panning.current.origTop  - (e.clientY - panning.current.startY);
         return;
       }
       if (!dragging.current) return;
@@ -191,12 +202,12 @@ export default function StickyNotesPage() {
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, []);
 
+  // Keyboard: delete selected note
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key !== 'Delete' && e.key !== 'Backspace') return;
       if (!selectedNote) return;
-      const tag = document.activeElement?.tagName;
-      if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+      if (['TEXTAREA','INPUT'].includes(document.activeElement?.tagName)) return;
       setNotes(prev => prev.filter(n => n.id !== selectedNote));
       setSelectedNote(null);
     }
@@ -204,8 +215,23 @@ export default function StickyNotesPage() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selectedNote]);
 
+  // Keyboard: tool shortcuts
+  useEffect(() => {
+    function onKey(e) {
+      if (['TEXTAREA','INPUT'].includes(document.activeElement?.tagName)) return;
+      switch (e.key.toLowerCase()) {
+        case 'v': setMode('select'); setShowStickers(false); break;
+        case 'h': setMode('pan');    setShowStickers(false); setSelectedNote(null); break;
+        case 's': setMode('note');   setShowStickers(false); break;
+        case 'e': setShowStickers(v => !v); break;
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const handleDragStart = useCallback((e, id, kind = 'note') => {
-    if (['TEXTAREA', 'INPUT', 'BUTTON'].includes(e.target.tagName)) return;
+    if (['TEXTAREA','INPUT','BUTTON'].includes(e.target.tagName)) return;
     e.preventDefault();
     const item = kind === 'sticker' ? stickers.find(s => s.id === id) : notes.find(n => n.id === id);
     if (!item) return;
@@ -217,17 +243,17 @@ export default function StickyNotesPage() {
 
   function handleBoardMouseDown(e) {
     if (mode !== 'pan') return;
-    if (['TEXTAREA', 'INPUT', 'BUTTON'].includes(e.target.tagName)) return;
+    if (['TEXTAREA','INPUT','BUTTON'].includes(e.target.tagName)) return;
     e.preventDefault();
     panning.current = { startX: e.clientX, startY: e.clientY, origLeft: boardRef.current.scrollLeft, origTop: boardRef.current.scrollTop };
   }
 
   function handleBoardClick(e) {
-    const classes = Array.from(e.target.classList);
-    if (classes.some(c => ['fj-board', 'fj-canvas'].includes(c))) setSelectedNote(null);
+    const cls = Array.from(e.target.classList);
+    if (cls.some(c => ['fj-board','fj-canvas'].includes(c))) setSelectedNote(null);
     if (mode === 'select' || mode === 'pan') return;
-    if (['TEXTAREA', 'INPUT', 'BUTTON'].includes(e.target.tagName)) return;
-    if (!classes.some(c => ['fj-board', 'fj-canvas', 'fj-canvas-text'].includes(c))) return;
+    if (['TEXTAREA','INPUT','BUTTON'].includes(e.target.tagName)) return;
+    if (!cls.some(c => ['fj-board','fj-canvas','fj-canvas-text'].includes(c))) return;
     const board = boardRef.current;
     const rect  = board.getBoundingClientRect();
     const x = e.clientX - rect.left + board.scrollLeft;
@@ -236,8 +262,7 @@ export default function StickyNotesPage() {
     if (mode === 'note') {
       const id = Date.now();
       setNotes(prev => [...prev, { id, x: x - 95, y: y - 90, text: '', author: '', color: selectedColor, tape: selectedTape, rotation: (Math.random() - 0.5) * 6, zIndex: topZ.current }]);
-      setJustCreated(id);
-      setSelectedNote(id);
+      setJustCreated(id); setSelectedNote(id);
       setTimeout(() => setJustCreated(null), 200);
     } else if (mode === 'sticker') {
       setStickers(prev => [...prev, { id: Date.now(), x: x - 20, y: y - 20, emoji: activeSticker, size: 36, zIndex: topZ.current }]);
@@ -251,8 +276,8 @@ export default function StickyNotesPage() {
   function handleBoardMouseLeave() { setCursorPos(null); }
 
   function handleUpdateNote(id, changes) { setNotes(prev => prev.map(n => n.id === id ? { ...n, ...changes } : n)); }
-  function handleDeleteNote(id)  { setNotes(prev => prev.filter(n => n.id !== id)); if (selectedNote === id) setSelectedNote(null); }
-  function handleDeleteSticker(id) { setStickers(prev => prev.filter(s => s.id !== id)); }
+  function handleDeleteNote(id)     { setNotes(prev => prev.filter(n => n.id !== id));     if (selectedNote === id) setSelectedNote(null); }
+  function handleDeleteSticker(id)  { setStickers(prev => prev.filter(s => s.id !== id)); }
 
   function handleReset() {
     if (window.confirm('Clear all notes and restore the original board?')) {
@@ -265,6 +290,7 @@ export default function StickyNotesPage() {
 
   return (
     <div className="fj-page">
+      {/* Board */}
       <div
         className={`fj-board${mode === 'select' ? ' fj-board--select' : ''}`}
         ref={boardRef}
@@ -288,18 +314,19 @@ export default function StickyNotesPage() {
         </div>
       </div>
 
-      {/* Topbar — transparent, floats over board */}
+      {/* Topbar */}
       <div className="fj-topbar">
         <div className="fj-topbar-left">
-          <span className="fj-pill">Jaylene’s Board</span>
+          <span className="fj-board-name">Jaylene’s Board</span>
         </div>
         <div className="fj-topbar-right">
           <button className="fj-reset-link" onClick={handleReset}>Reset board</button>
-          <span className="fj-pill fj-pill--avatar">JR</span>
-          <a className="fj-pill fj-pill--cta" href={PORTFOLIO_URL}>Return to Portfolio</a>
+          <div className="fj-avatar">JR</div>
+          <a className="fj-return-btn" href={PORTFOLIO_URL}>Return to Portfolio</a>
         </div>
       </div>
 
+      {/* Sticker picker */}
       {showStickers && (
         <div className="fj-sticker-tray">
           {STICKERS.map(em => (
@@ -311,45 +338,74 @@ export default function StickyNotesPage() {
         </div>
       )}
 
-      {/* Bottom toolbar */}
+      {/* Toolbar */}
       <div className="fj-toolbar">
-        {/* Navigation tools */}
+        {/* Nav tools: select + hand */}
         <div className="tb-tools">
-          <button className={`tb-tool${mode === 'select'  ? ' active' : ''}`} onClick={() => { setMode('select');  setShowStickers(false); }} title="Select"><CursorIcon /></button>
-          <button className={`tb-tool${mode === 'pan'     ? ' active' : ''}`} onClick={() => { setMode('pan');     setShowStickers(false); setSelectedNote(null); }} title="Pan canvas"><HandIcon /></button>
-          <button className={`tb-tool${mode === 'note'    ? ' active' : ''}`} onClick={() => { setMode('note');    setShowStickers(false); }} title="Add note"><NoteIcon /></button>
-          <button className={`tb-tool${mode === 'sticker' ? ' active' : ''}`} onClick={() => setShowStickers(v => !v)} title="Add sticker"><StickerIcon /></button>
+          <Tooltip label="Select" shortcut="V">
+            <button className={`tb-tool${mode === 'select' ? ' active' : ''}`}
+              onClick={() => { setMode('select'); setShowStickers(false); }}>
+              <CursorIcon />
+            </button>
+          </Tooltip>
+          <Tooltip label="Hand" shortcut="H">
+            <button className={`tb-tool${mode === 'pan' ? ' active' : ''}`}
+              onClick={() => { setMode('pan'); setShowStickers(false); setSelectedNote(null); }}>
+              <HandIcon />
+            </button>
+          </Tooltip>
         </div>
+
         <div className="tb-sep" />
+
+        {/* Creation tools: note + sticker */}
+        <div className="tb-tools">
+          <Tooltip label="Sticky note" shortcut="S">
+            <button className={`tb-tool${mode === 'note' ? ' active' : ''}`}
+              onClick={() => { setMode('note'); setShowStickers(false); }}>
+              <NoteIcon />
+            </button>
+          </Tooltip>
+          <Tooltip label="Stickers" shortcut="E">
+            <button className={`tb-tool${mode === 'sticker' ? ' active' : ''}`}
+              onClick={() => setShowStickers(v => !v)}>
+              <StickerIcon />
+            </button>
+          </Tooltip>
+        </div>
+
+        <div className="tb-sep" />
+
+        {/* Color */}
         <div className="tb-section">
           <span className="tb-label">Color</span>
           <div className="tb-row">
             {NOTE_COLORS.map(c => (
-              <button key={c.id} className={`tb-color${selectedColor === c.id ? ' active' : ''}`}
-                style={{ background: c.bg }} onClick={() => setSelectedColor(c.id)} title={c.label} />
+              <Tooltip key={c.id} label={c.label}>
+                <button className={`tb-color${selectedColor === c.id ? ' active' : ''}`}
+                  style={{ background: c.bg }} onClick={() => setSelectedColor(c.id)} />
+              </Tooltip>
             ))}
           </div>
         </div>
+
         <div className="tb-sep" />
+
+        {/* Tape */}
         <div className="tb-section">
           <span className="tb-label">Tape</span>
           <div className="tb-row">
             {TAPE_STYLES.map(t => (
-              <button key={t.id} className={`tb-tape${selectedTape === t.id ? ' active' : ''}`}
-                style={{ ...t.css }} onClick={() => setSelectedTape(t.id)} title={t.label} />
+              <Tooltip key={t.id} label={t.label}>
+                <button className={`tb-tape${selectedTape === t.id ? ' active' : ''}`}
+                  style={{ ...t.css }} onClick={() => setSelectedTape(t.id)} />
+              </Tooltip>
             ))}
           </div>
         </div>
-        <div className="tb-sep" />
-        <button className="tb-post"
-          onClick={() => { setMode(m => m === 'note' ? 'select' : 'note'); setShowStickers(false); }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          Add note
-        </button>
       </div>
 
+      {/* Visitor cursor */}
       {cursorPos && mode === 'select' && (
         <div className="fj-cursor" style={{ left: cursorPos.x, top: cursorPos.y }} aria-hidden="true">
           <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
