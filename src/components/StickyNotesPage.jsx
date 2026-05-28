@@ -86,7 +86,7 @@ function StickerIcon() {
 
 // ─── Sticky note component ────────────────────────────────────────────────────
 
-function StickyNote({ note, onUpdate, onDelete, onDragStart, autoFocus }) {
+function StickyNote({ note, onUpdate, onDelete, onDragStart, autoFocus, flyInDelay }) {
   const colorObj = NOTE_COLORS.find(c => c.id === note.color) || NOTE_COLORS[0];
   const sizeObj  = TEXT_SIZES.find(s => s.id === note.textSize)  || TEXT_SIZES[1];
   const tapeCss  = (TAPE_STYLES.find(t => t.id === note.tape) || TAPE_STYLES[0]).css;
@@ -97,7 +97,12 @@ function StickyNote({ note, onUpdate, onDelete, onDragStart, autoFocus }) {
   return (
     <div
       className="sn-note"
-      style={{ left: note.x, top: note.y, background: colorObj.bg, transform: `rotate(${note.rotation}deg)`, zIndex: note.zIndex || 1 }}
+      style={{
+        left: note.x, top: note.y, background: colorObj.bg,
+        transform: `rotate(${note.rotation}deg)`, zIndex: note.zIndex || 1,
+        '--note-rot': `${note.rotation}deg`,
+        animationDelay: flyInDelay != null ? `${flyInDelay}ms` : '0ms',
+      }}
       onMouseDown={(e) => onDragStart(e, note.id)}
     >
       <div className="sn-tape" style={tapeCss} />
@@ -143,6 +148,7 @@ function Sticker({ sticker, onDragStart, onDelete }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function StickyNotesPage({ onReturn }) {
+  const [mounted,         setMounted]         = useState(false);
   const [notes,           setNotes]           = useState(() => restore(LS_NOTES,    SEED_NOTES));
   const [stickers,        setStickers]        = useState(() => restore(LS_STICKERS, SEED_STICKERS));
   const [mode,            setMode]            = useState('select');
@@ -153,12 +159,14 @@ export default function StickyNotesPage({ onReturn }) {
   const [activeSticker,   setActiveSticker]   = useState('🌟');
   const [justCreated,     setJustCreated]     = useState(null);
 
+  const seedIds   = useRef(new Set(notes.map(n => n.id)));
   const boardRef  = useRef(null);
   const dragging  = useRef(null);
   const topZ      = useRef(Math.max(...SEED_NOTES.map(n => n.zIndex), 10));
 
   useEffect(() => { persist(LS_NOTES,    notes);    }, [notes]);
   useEffect(() => { persist(LS_STICKERS, stickers); }, [stickers]);
+  useEffect(() => { const t = setTimeout(() => setMounted(true), 50); return () => clearTimeout(t); }, []);
 
   // Global drag
   useEffect(() => {
@@ -265,13 +273,14 @@ export default function StickyNotesPage({ onReturn }) {
             Pick a color below → click the board → type your message ✦
           </div>
 
-          {notes.map(n => (
+          {notes.map((n, i) => (
             <StickyNote
               key={n.id} note={n}
               onUpdate={handleUpdateNote}
               onDelete={handleDeleteNote}
               onDragStart={handleDragStart}
               autoFocus={n.id === justCreated}
+              flyInDelay={seedIds.current.has(n.id) ? i * 120 : null}
             />
           ))}
 

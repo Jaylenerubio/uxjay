@@ -897,6 +897,13 @@ td { padding: 12px 16px; vertical-align: middle; font-size: 14px; color: var(--b
 }
 
 /* ── Sticky note ─────────────────────────────────────────────── */
+@keyframes note-fly-in {
+  0%   { opacity: 0; transform: translateY(-180px) rotate(var(--note-rot)) scale(0.85); }
+  60%  { opacity: 1; transform: translateY(12px)   rotate(var(--note-rot)) scale(1.03); }
+  80%  { transform: translateY(-6px)  rotate(var(--note-rot)) scale(0.99); }
+  100% { transform: translateY(0px)   rotate(var(--note-rot)) scale(1); }
+}
+
 .sn-note {
   position: absolute;
   width: 195px;
@@ -908,6 +915,8 @@ td { padding: 12px 16px; vertical-align: middle; font-size: 14px; color: var(--b
   cursor: grab;
   padding: 26px 14px 10px;
   transition: box-shadow 0.15s;
+  --note-rot: 0deg;
+  animation: note-fly-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .sn-note:active { cursor: grabbing; box-shadow: 6px 10px 30px rgba(0,0,0,0.22); }
 .sn-note:hover .sn-delete { opacity: 1; }
