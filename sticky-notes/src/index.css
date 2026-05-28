@@ -22,7 +22,7 @@ body { background: #FDFDFD; }
 }
 .fj-canvas { position: relative; width: 2400px; height: 1500px; }
 
-.fj-board--select .sn-note    { cursor: none; }
+.fj-board--select .sn-fly     { cursor: none; }
 .fj-board--select .sn-sticker { cursor: none; }
 .sn-text   { cursor: text    !important; }
 .sn-author { cursor: text    !important; }
@@ -66,7 +66,6 @@ body { background: #FDFDFD; }
 .fj-topbar-left  { display: flex; align-items: center; gap: 8px; }
 .fj-topbar-right { display: flex; align-items: center; gap: 8px; }
 
-/* Board name pill */
 .fj-board-name {
   display: inline-flex;
   align-items: center;
@@ -83,7 +82,6 @@ body { background: #FDFDFD; }
   white-space: nowrap;
 }
 
-/* JR circle avatar */
 .fj-avatar {
   width: 34px;
   height: 34px;
@@ -99,7 +97,6 @@ body { background: #FDFDFD; }
   letter-spacing: 0.02em;
 }
 
-/* Return to Portfolio */
 .fj-return-btn {
   display: inline-flex;
   align-items: center;
@@ -133,22 +130,73 @@ body { background: #FDFDFD; }
 }
 .fj-reset-link:hover { color: #555; }
 
-/* ── Sticky note ─────────────────────────────────────────────── */
-.sn-note {
+/* ── Fly wrapper (handles position + entry animation) ────────── */
+.sn-fly {
   position: absolute;
+  cursor: grab;
+}
+.sn-fly:active { cursor: grabbing; }
+.sn-fly:active .sn-note { box-shadow: 6px 10px 30px rgba(0,0,0,0.22); }
+.sn-fly:hover .sn-delete,
+.sn-fly .sn-note.selected .sn-delete { opacity: 1; }
+
+/* ── Fly-in keyframes ────────────────────────────────────────── */
+@keyframes fly-from-top {
+  0%   { transform: translateY(-55vh) rotate(-7deg) scale(0.76); opacity: 0; }
+  22%  { opacity: 0.65; }
+  72%  { transform: translateY(4px) rotate(0.4deg) scale(1.01); opacity: 1; }
+  87%  { transform: translateY(-2px) scale(1.0); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+@keyframes fly-from-right {
+  0%   { transform: translateX(75vw) rotate(9deg) scale(0.76); opacity: 0; }
+  22%  { opacity: 0.65; }
+  72%  { transform: translateX(-4px) rotate(-0.4deg) scale(1.01); opacity: 1; }
+  87%  { transform: translateX(2px) scale(1.0); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); opacity: 1; }
+}
+@keyframes fly-from-bottom {
+  0%   { transform: translateY(55vh) rotate(7deg) scale(0.76); opacity: 0; }
+  22%  { opacity: 0.65; }
+  72%  { transform: translateY(-4px) rotate(-0.4deg) scale(1.01); opacity: 1; }
+  87%  { transform: translateY(2px) scale(1.0); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+@keyframes fly-from-left {
+  0%   { transform: translateX(-75vw) rotate(-9deg) scale(0.76); opacity: 0; }
+  22%  { opacity: 0.65; }
+  72%  { transform: translateX(4px) rotate(0.4deg) scale(1.01); opacity: 1; }
+  87%  { transform: translateX(-2px) scale(1.0); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); opacity: 1; }
+}
+
+.sn-fly.entering[data-dir="top"]    { animation: fly-from-top    1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.sn-fly.entering[data-dir="right"]  { animation: fly-from-right  1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.sn-fly.entering[data-dir="bottom"] { animation: fly-from-bottom 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.sn-fly.entering[data-dir="left"]   { animation: fly-from-left   1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+
+/* ── Wind keyframes ────────────────────────────────────────────── */
+@keyframes paper-wind {
+  0%, 100% { transform: rotate(var(--rot)); }
+  20%      { transform: rotate(var(--rot)) perspective(600px) rotateX(1.8deg) rotateY(-1.2deg); }
+  55%      { transform: rotate(var(--rot)) perspective(600px) rotateX(-1.3deg) rotateY(1.7deg); }
+  80%      { transform: rotate(var(--rot)) perspective(600px) rotateX(0.9deg) rotateY(-0.7deg); }
+}
+
+/* ── Sticky note (inner, handles rotation + wind) ────────────── */
+.sn-note {
+  position: relative;
   width: 195px;
   min-height: 185px;
   display: flex;
   flex-direction: column;
   border-radius: 2px;
   box-shadow: 2px 4px 12px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.07);
-  cursor: grab;
   padding: 28px 14px 10px;
   transition: box-shadow 0.15s;
+  animation: paper-wind 8s ease-in-out infinite;
+  animation-delay: var(--flap-delay, 0s);
 }
-.sn-note:active { cursor: grabbing; box-shadow: 6px 10px 30px rgba(0,0,0,0.22); }
-.sn-note:hover .sn-delete,
-.sn-note.selected .sn-delete { opacity: 1; }
 .sn-note.selected { outline: 2px solid #6366f1; outline-offset: 2px; }
 
 /* Mini toolbar above selected note */

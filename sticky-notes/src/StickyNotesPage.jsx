@@ -49,6 +49,40 @@ function restore(key, fallback) {
   return fallback;
 }
 
+// ─── Entering map helpers ─────────────────────────────────────────────────────
+function makeEnteringMap(notesList) {
+  const dirs = ['top', 'right', 'bottom', 'left'];
+  return Object.fromEntries(
+    notesList.map((n, i) => [n.id, { dir: dirs[i % 4], delay: 600 + i * 200 }])
+  );
+}
+
+// ─── Sound ────────────────────────────────────────────────────────────────────
+function playStickSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const ogain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(580, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(130, ctx.currentTime + 0.1);
+    ogain.gain.setValueAtTime(0.32, ctx.currentTime);
+    ogain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.14);
+    osc.connect(ogain); ogain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.14);
+    const bufSize = Math.floor(ctx.sampleRate * 0.055);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.14));
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const filt = ctx.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 3400; filt.Q.value = 0.65;
+    const ngain = ctx.createGain(); ngain.gain.setValueAtTime(0.18, ctx.currentTime);
+    src.connect(filt); filt.connect(ngain); ngain.connect(ctx.destination);
+    src.start();
+    setTimeout(() => ctx.close(), 800);
+  } catch {}
+}
+
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
 function Tooltip({ label, shortcut, children }) {
   const [show, setShow] = useState(false);
@@ -87,46 +121,80 @@ function StickerIcon() {
 }
 
 // ─── Sticky Note ──────────────────────────────────────────────────────────────
-function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDragStart, autoFocus }) {
+function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDragStart, autoFocus, enterDir, enterDelay, onEntered }) {
   const colorObj = NOTE_COLORS.find(c => c.id === note.color) || NOTE_COLORS[0];
   const tapeCss  = (TAPE_STYLES.find(t => t.id === note.tape) || TAPE_STYLES[0]).css;
   const taRef    = useRef(null);
+
   useEffect(() => { if (autoFocus && taRef.current) taRef.current.focus(); }, [autoFocus]);
+
+  const flapDelay = (() => {
+    let h = 0;
+    const s = String(note.id);
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 10000;
+    return ((h % 70) / 10).toFixed(1);
+  })();
+
+  const isEntering = Boolean(enterDir);
+
   return (
     <div
-      className={`sn-note${isSelected ? ' selected' : ''}`}
-      style={{ left: note.x, top: note.y, background: colorObj.bg, transform: `rotate(${note.rotation}deg)`, zIndex: note.zIndex || 1 }}
-      onMouseDown={(e) => { if (mode === 'pan') return; onSelect(note.id); onDragStart(e, note.id); }}
+      className={`sn-fly${isEntering ? ' entering' : ''}`}
+      data-dir={enterDir || undefined}
+      style={{
+        left: note.x,
+        top: note.y,
+        zIndex: note.zIndex || 1,
+        ...(isEntering ? { animationDelay: `${enterDelay ?? 0}ms` } : {}),
+      }}
+      onMouseDown={(e) => {
+        if (mode === 'pan') return;
+        onSelect(note.id);
+        onDragStart(e, note.id);
+      }}
+      onAnimationEnd={(e) => {
+        if (e.animationName && e.animationName.startsWith('fly-')) onEntered?.();
+      }}
     >
-      {isSelected && (
-        <div
-          className="sn-mini-toolbar"
-          style={{ transform: `translateX(-50%) rotate(${-note.rotation}deg)` }}
-          onMouseDown={e => e.stopPropagation()}
-          onClick={e => e.stopPropagation()}
-        >
-          {NOTE_COLORS.map(c => (
-            <button key={c.id} className={`sn-mt-color${note.color === c.id ? ' active' : ''}`}
-              style={{ background: c.bg }}
-              onClick={(e) => { e.stopPropagation(); onUpdate(note.id, { color: c.id }); }}
-              title={c.label} />
-          ))}
-          <div className="sn-mt-sep" />
-          {TAPE_STYLES.map(t => (
-            <button key={t.id} className={`sn-mt-tape${note.tape === t.id ? ' active' : ''}`}
-              style={t.css}
-              onClick={(e) => { e.stopPropagation(); onUpdate(note.id, { tape: t.id }); }}
-              title={t.label} />
-          ))}
+      <div
+        className={`sn-note${isSelected ? ' selected' : ''}`}
+        style={{
+          background: colorObj.bg,
+          transform: `rotate(${note.rotation}deg)`,
+          '--rot': `${note.rotation}deg`,
+          '--flap-delay': `${flapDelay}s`,
+        }}
+      >
+        {isSelected && (
+          <div
+            className="sn-mini-toolbar"
+            style={{ transform: `translateX(-50%) rotate(${-note.rotation}deg)` }}
+            onMouseDown={e => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
+          >
+            {NOTE_COLORS.map(c => (
+              <button key={c.id} className={`sn-mt-color${note.color === c.id ? ' active' : ''}`}
+                style={{ background: c.bg }}
+                onClick={(e) => { e.stopPropagation(); onUpdate(note.id, { color: c.id }); }}
+                title={c.label} />
+            ))}
+            <div className="sn-mt-sep" />
+            {TAPE_STYLES.map(t => (
+              <button key={t.id} className={`sn-mt-tape${note.tape === t.id ? ' active' : ''}`}
+                style={t.css}
+                onClick={(e) => { e.stopPropagation(); onUpdate(note.id, { tape: t.id }); }}
+                title={t.label} />
+            ))}
+          </div>
+        )}
+        <div className="sn-tape" style={tapeCss} />
+        <button className="sn-delete" onClick={(e) => { e.stopPropagation(); onDelete(note.id); }} onMouseDown={(e) => e.stopPropagation()} title="Delete">×</button>
+        <textarea ref={taRef} className="sn-text" placeholder="Write something nice…" value={note.text}
+          onChange={(e) => onUpdate(note.id, { text: e.target.value })} onMouseDown={(e) => e.stopPropagation()} />
+        <div className="sn-footer">
+          <input className="sn-author" placeholder="— your name" value={note.author || ''}
+            onChange={(e) => onUpdate(note.id, { author: e.target.value })} onMouseDown={(e) => e.stopPropagation()} />
         </div>
-      )}
-      <div className="sn-tape" style={tapeCss} />
-      <button className="sn-delete" onClick={(e) => { e.stopPropagation(); onDelete(note.id); }} onMouseDown={(e) => e.stopPropagation()} title="Delete">×</button>
-      <textarea ref={taRef} className="sn-text" placeholder="Write something nice…" value={note.text}
-        onChange={(e) => onUpdate(note.id, { text: e.target.value })} onMouseDown={(e) => e.stopPropagation()} />
-      <div className="sn-footer">
-        <input className="sn-author" placeholder="— your name" value={note.author || ''}
-          onChange={(e) => onUpdate(note.id, { author: e.target.value })} onMouseDown={(e) => e.stopPropagation()} />
       </div>
     </div>
   );
@@ -158,6 +226,10 @@ export default function StickyNotesPage() {
   const [justCreated,   setJustCreated]   = useState(null);
   const [cursorPos,     setCursorPos]     = useState(null);
 
+  const [enteringMap, setEnteringMap] = useState(() =>
+    makeEnteringMap(restore(LS_NOTES, SEED_NOTES))
+  );
+
   const [visitorNum] = useState(() => {
     try {
       const stored = localStorage.getItem('uxjay_visitor_num');
@@ -176,6 +248,10 @@ export default function StickyNotesPage() {
 
   useEffect(() => { persist(LS_NOTES,    notes);    }, [notes]);
   useEffect(() => { persist(LS_STICKERS, stickers); }, [stickers]);
+
+  function handleEntered(id) {
+    setEnteringMap(prev => { const n = { ...prev }; delete n[id]; return n; });
+  }
 
   // Global drag / pan
   useEffect(() => {
@@ -236,8 +312,12 @@ export default function StickyNotesPage() {
     const item = kind === 'sticker' ? stickers.find(s => s.id === id) : notes.find(n => n.id === id);
     if (!item) return;
     topZ.current += 1;
-    if (kind === 'sticker') setStickers(prev => prev.map(s => s.id === id ? { ...s, zIndex: topZ.current } : s));
-    else setNotes(prev => prev.map(n => n.id === id ? { ...n, zIndex: topZ.current } : n));
+    if (kind === 'sticker') {
+      setStickers(prev => prev.map(s => s.id === id ? { ...s, zIndex: topZ.current } : s));
+    } else {
+      setNotes(prev => prev.map(n => n.id === id ? { ...n, zIndex: topZ.current } : n));
+      setEnteringMap(prev => { const n = { ...prev }; delete n[id]; return n; });
+    }
     dragging.current = { id, kind, startX: e.clientX, startY: e.clientY, origX: item.x, origY: item.y };
   }, [notes, stickers]);
 
@@ -262,6 +342,8 @@ export default function StickyNotesPage() {
     if (mode === 'note') {
       const id = Date.now();
       setNotes(prev => [...prev, { id, x: x - 95, y: y - 90, text: '', author: '', color: selectedColor, tape: selectedTape, rotation: (Math.random() - 0.5) * 6, zIndex: topZ.current }]);
+      setEnteringMap(prev => ({ ...prev, [id]: { dir: 'top', delay: 0 } }));
+      playStickSound();
       setJustCreated(id); setSelectedNote(id);
       setTimeout(() => setJustCreated(null), 200);
     } else if (mode === 'sticker') {
@@ -283,6 +365,7 @@ export default function StickyNotesPage() {
     if (window.confirm('Clear all notes and restore the original board?')) {
       localStorage.removeItem(LS_NOTES); localStorage.removeItem(LS_STICKERS);
       setNotes(SEED_NOTES); setStickers(SEED_STICKERS); setSelectedNote(null);
+      setEnteringMap(makeEnteringMap(SEED_NOTES));
     }
   }
 
@@ -302,12 +385,26 @@ export default function StickyNotesPage() {
       >
         <div className="fj-canvas">
           <div className="fj-canvas-text" style={{ left: 80, top: 155 }}>Leave me<br />a note</div>
-          <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>I’d love any book, movie, and show recommendations!</div>
-          {notes.map(n => (
-            <StickyNote key={n.id} note={n} mode={mode} isSelected={selectedNote === n.id}
-              onSelect={setSelectedNote} onUpdate={handleUpdateNote} onDelete={handleDeleteNote}
-              onDragStart={handleDragStart} autoFocus={n.id === justCreated} />
-          ))}
+          <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>I'd love any book, movie, and show recommendations!</div>
+          {notes.map(n => {
+            const entering = enteringMap[n.id];
+            return (
+              <StickyNote
+                key={n.id}
+                note={n}
+                mode={mode}
+                isSelected={selectedNote === n.id}
+                onSelect={setSelectedNote}
+                onUpdate={handleUpdateNote}
+                onDelete={handleDeleteNote}
+                onDragStart={handleDragStart}
+                autoFocus={n.id === justCreated}
+                enterDir={entering?.dir}
+                enterDelay={entering?.delay}
+                onEntered={() => handleEntered(n.id)}
+              />
+            );
+          })}
           {stickers.map(s => (
             <Sticker key={s.id} sticker={s} onDragStart={handleDragStart} onDelete={handleDeleteSticker} />
           ))}
@@ -317,7 +414,7 @@ export default function StickyNotesPage() {
       {/* Topbar */}
       <div className="fj-topbar">
         <div className="fj-topbar-left">
-          <span className="fj-board-name">Jaylene’s Board</span>
+          <span className="fj-board-name">Jaylene's Board</span>
         </div>
         <div className="fj-topbar-right">
           <button className="fj-reset-link" onClick={handleReset}>Reset board</button>
@@ -340,7 +437,6 @@ export default function StickyNotesPage() {
 
       {/* Toolbar */}
       <div className="fj-toolbar">
-        {/* Nav tools: select + hand */}
         <div className="tb-tools">
           <Tooltip label="Select" shortcut="V">
             <button className={`tb-tool${mode === 'select' ? ' active' : ''}`}
@@ -358,7 +454,6 @@ export default function StickyNotesPage() {
 
         <div className="tb-sep" />
 
-        {/* Creation tools: note + sticker */}
         <div className="tb-tools">
           <Tooltip label="Sticky note" shortcut="S">
             <button className={`tb-tool${mode === 'note' ? ' active' : ''}`}
@@ -376,7 +471,6 @@ export default function StickyNotesPage() {
 
         <div className="tb-sep" />
 
-        {/* Color */}
         <div className="tb-section">
           <span className="tb-label">Color</span>
           <div className="tb-row">
@@ -391,7 +485,6 @@ export default function StickyNotesPage() {
 
         <div className="tb-sep" />
 
-        {/* Tape */}
         <div className="tb-section">
           <span className="tb-label">Tape</span>
           <div className="tb-row">
