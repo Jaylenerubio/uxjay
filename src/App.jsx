@@ -27,16 +27,20 @@ export default function App() {
     setSelectedClientId(null);
   }
 
+  // Sticky notes is full-screen — no sidebar
+  if (page === 'sticky-notes') {
+    return <StickyNotesPage onReturn={() => setPage('dashboard')} />;
+  }
+
   function renderPage() {
     switch (page) {
       case 'dashboard':    return <Dashboard />;
       case 'activity':     return <ActivityPage />;
       case 'clients':      return <ClientsPage onClientSelect={handleClientSelect} />;
       case 'documents':    return <DocumentsPage />;
-      case 'notices':       return <NoticesPage />;
-      case 'sticky-notes':  return <StickyNotesPage />;
-      case 'clientDetail':  return <ClientDetail clientId={selectedClientId} onBack={handleBack} />;
-      default:              return <Dashboard />;
+      case 'notices':      return <NoticesPage />;
+      case 'clientDetail': return <ClientDetail clientId={selectedClientId} onBack={handleBack} />;
+      default:             return <Dashboard />;
     }
   }
 
