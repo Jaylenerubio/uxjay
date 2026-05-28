@@ -17,7 +17,8 @@ export const caseStudies = [
     metricLabel: 'faster processing',
     metricSecondary: '83%',
     metricSecondaryLabel: 'engagement increase',
-    overview: "My File NYC is a platform helping New York City residents securely store, manage, and share documents needed to access government benefits and services. As Senior Product Designer, I led end-to-end design strategy across resident-facing and agency-facing workflows — from scalable document upload flows to status tracking and a centralized design system adopted across four products.",
+    editorialHeadline: 'Streamlined agency workflows by refining the UX and creating a scalable design system',
+    productDesc: "My File NYC is a platform that supports both residents and agencies throughout the shelter, letting both parties focus on housing — not paperwork.",
     challenge: "New Yorkers applying for city benefits faced a broken document submission experience — repeated uploads across agencies, unclear status tracking, and no way to know if their documents were received or accepted. Agency staff were equally frustrated by inconsistent formats and manual review bottlenecks. The product had accumulated years of disconnected feature additions with no unifying design language.",
     process: [
       {
@@ -95,7 +96,8 @@ export const caseStudies = [
     metricLabel: 'full product built',
     metricSecondary: '2026',
     metricSecondaryLabel: 'NYC.gov pilot',
-    overview: "Jobs NYC is a platform connecting workforce training programs and their vetted, upskilled candidates with NYC employers actively hiring for specific skill sets. I led the complete 0→1 design — from initial research through launch — building a three-sided marketplace that serves job seekers, program providers, and employers. The platform was later selected as an early pilot for the 2026 NYC.gov Design System.",
+    editorialHeadline: 'Designed a 0→1 workforce marketplace connecting upskilled New Yorkers with employers — later piloting the 2026 NYC.gov Design System',
+    productDesc: "Jobs NYC is a platform that connects workforce training programs and their vetted graduates with NYC employers actively hiring for specific skill sets.",
     challenge: "Workforce programs had no efficient way to showcase their graduates to employers, and employers had no trusted pipeline to find pre-vetted, upskilled candidates. Job seekers were qualified but invisible. Existing tools were disconnected, inaccessible, and designed for the agency — not the people.",
     process: [
       {
@@ -173,7 +175,8 @@ export const caseStudies = [
     metricLabel: 'products unified',
     metricSecondary: '30+',
     metricSecondaryLabel: 'research sessions',
-    overview: "The Workforce Data Portal gives program coordinators, policy staff, and city planners real-time visibility into workforce program outcomes — helping them make data-driven decisions about resource allocation, program improvements, and city-wide workforce strategy.",
+    editorialHeadline: 'Replaced manual reporting with a role-based analytics portal giving city planners real-time workforce insights',
+    productDesc: "The Workforce Data Portal gives program coordinators, policy staff, and city planners real-time visibility into workforce program outcomes — replacing hours of manual reporting.",
     challenge: "Program data was scattered across spreadsheets, email chains, and disconnected tools. Coordinators spent hours each week manually compiling reports. Policy staff and leadership wanted different views of the same data — but had no way to access it without requesting custom exports.",
     process: [
       {
@@ -251,7 +254,8 @@ export const caseStudies = [
     metricLabel: 'delivery timeline',
     metricSecondary: 'Scalable',
     metricSecondaryLabel: 'system reused',
-    overview: "Orchid is a B2B platform designed to streamline supplier relationship management for enterprise clients. At Moment Studio, I translated complex business requirements into user-centered digital solutions — building a scalable design system and complete product under one of the tightest timelines of my career.",
+    editorialHeadline: 'Delivered a scalable enterprise procurement platform and design system on a 5-month agency timeline',
+    productDesc: "Orchid is a B2B platform streamlining supplier relationship management for enterprise clients — designed and delivered at Moment Studio under a tight agency timeline.",
     challenge: "Enterprise procurement teams were managing hundreds of supplier relationships through email threads, spreadsheets, and disconnected portals. Every stakeholder level had different workflows. Existing tools forced users to adapt to the software — not the other way around.",
     process: [
       {
