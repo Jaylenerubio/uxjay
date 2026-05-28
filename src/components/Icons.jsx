@@ -202,6 +202,14 @@ export function Icon({ name, size = 18, color = 'currentColor', strokeWidth = 1.
           <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
         </svg>
       );
+    case 'sticky-note':
+    case 'note':
+      return (
+        <svg {...props}>
+          <polygon points="3 3 21 3 21 17 15 21 3 21" />
+          <polyline points="15 21 15 17 21 17" />
+        </svg>
+      );
     default:
       return null;
   }
