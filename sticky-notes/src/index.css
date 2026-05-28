@@ -170,10 +170,10 @@ body { background: #FDFDFD; }
   100% { transform: translateX(0) rotate(0deg) scale(1); opacity: 1; }
 }
 
-.sn-fly.entering[data-dir="top"]    { animation: fly-from-top    1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-.sn-fly.entering[data-dir="right"]  { animation: fly-from-right  1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-.sn-fly.entering[data-dir="bottom"] { animation: fly-from-bottom 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-.sn-fly.entering[data-dir="left"]   { animation: fly-from-left   1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+.sn-fly.entering[data-dir="top"]    { animation: fly-from-top    1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.sn-fly.entering[data-dir="right"]  { animation: fly-from-right  1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.sn-fly.entering[data-dir="bottom"] { animation: fly-from-bottom 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+.sn-fly.entering[data-dir="left"]   { animation: fly-from-left   1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
 
 /* ── Wind keyframes ────────────────────────────────────────────── */
 @keyframes paper-wind {

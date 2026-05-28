@@ -53,7 +53,7 @@ function restore(key, fallback) {
 function makeEnteringMap(notesList) {
   const dirs = ['top', 'right', 'bottom', 'left'];
   return Object.fromEntries(
-    notesList.map((n, i) => [n.id, { dir: dirs[i % 4], delay: i * 130 }])
+    notesList.map((n, i) => [n.id, { dir: dirs[i % 4], delay: 600 + i * 200 }])
   );
 }
 
@@ -385,7 +385,7 @@ export default function StickyNotesPage() {
       >
         <div className="fj-canvas">
           <div className="fj-canvas-text" style={{ left: 80, top: 155 }}>Leave me<br />a note</div>
-          <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>I’d love any book, movie, and show recommendations!</div>
+          <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>I'd love any book, movie, and show recommendations!</div>
           {notes.map(n => {
             const entering = enteringMap[n.id];
             return (
@@ -414,7 +414,7 @@ export default function StickyNotesPage() {
       {/* Topbar */}
       <div className="fj-topbar">
         <div className="fj-topbar-left">
-          <span className="fj-board-name">Jaylene’s Board</span>
+          <span className="fj-board-name">Jaylene's Board</span>
         </div>
         <div className="fj-topbar-right">
           <button className="fj-reset-link" onClick={handleReset}>Reset board</button>
