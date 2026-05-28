@@ -43,7 +43,7 @@
   /* Typography */
   --font-display: 'Space Grotesk', sans-serif;
   --font-body:    'Inter', sans-serif;
-  --font-hand:    'Segoe Script', cursive;
+  --font-hand:    'Brush Script MT', 'Brush Script Std', cursive;
 
   font-family: var(--font-body);
   font-size: 16px;
