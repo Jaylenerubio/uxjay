@@ -81,12 +81,7 @@ function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDr
   return (
     <div
       className={`sn-note${isSelected ? ' selected' : ''}`}
-      style={{
-        left: note.x, top: note.y,
-        background: colorObj.bg,
-        transform: `rotate(${note.rotation}deg)`,
-        zIndex: note.zIndex || 1,
-      }}
+      style={{ left: note.x, top: note.y, background: colorObj.bg, transform: `rotate(${note.rotation}deg)`, zIndex: note.zIndex || 1 }}
       onMouseDown={(e) => {
         if (mode === 'pan') return;
         onSelect(note.id);
@@ -101,49 +96,27 @@ function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDr
           onClick={e => e.stopPropagation()}
         >
           {NOTE_COLORS.map(c => (
-            <button
-              key={c.id}
-              className={`sn-mt-color${note.color === c.id ? ' active' : ''}`}
+            <button key={c.id} className={`sn-mt-color${note.color === c.id ? ' active' : ''}`}
               style={{ background: c.bg }}
               onClick={(e) => { e.stopPropagation(); onUpdate(note.id, { color: c.id }); }}
-              title={c.label}
-            />
+              title={c.label} />
           ))}
           <div className="sn-mt-sep" />
           {TAPE_STYLES.map(t => (
-            <button
-              key={t.id}
-              className={`sn-mt-tape${note.tape === t.id ? ' active' : ''}`}
+            <button key={t.id} className={`sn-mt-tape${note.tape === t.id ? ' active' : ''}`}
               style={t.css}
               onClick={(e) => { e.stopPropagation(); onUpdate(note.id, { tape: t.id }); }}
-              title={t.label}
-            />
+              title={t.label} />
           ))}
         </div>
       )}
       <div className="sn-tape" style={tapeCss} />
-      <button
-        className="sn-delete"
-        onClick={(e) => { e.stopPropagation(); onDelete(note.id); }}
-        onMouseDown={(e) => e.stopPropagation()}
-        title="Delete"
-      >×</button>
-      <textarea
-        ref={taRef}
-        className="sn-text"
-        placeholder="Write something nice…"
-        value={note.text}
-        onChange={(e) => onUpdate(note.id, { text: e.target.value })}
-        onMouseDown={(e) => e.stopPropagation()}
-      />
+      <button className="sn-delete" onClick={(e) => { e.stopPropagation(); onDelete(note.id); }} onMouseDown={(e) => e.stopPropagation()} title="Delete">×</button>
+      <textarea ref={taRef} className="sn-text" placeholder="Write something nice…" value={note.text}
+        onChange={(e) => onUpdate(note.id, { text: e.target.value })} onMouseDown={(e) => e.stopPropagation()} />
       <div className="sn-footer">
-        <input
-          className="sn-author"
-          placeholder="— your name"
-          value={note.author || ''}
-          onChange={(e) => onUpdate(note.id, { author: e.target.value })}
-          onMouseDown={(e) => e.stopPropagation()}
-        />
+        <input className="sn-author" placeholder="— your name" value={note.author || ''}
+          onChange={(e) => onUpdate(note.id, { author: e.target.value })} onMouseDown={(e) => e.stopPropagation()} />
       </div>
     </div>
   );
@@ -151,13 +124,11 @@ function StickyNote({ note, mode, isSelected, onSelect, onUpdate, onDelete, onDr
 
 function Sticker({ sticker, onDragStart, onDelete }) {
   return (
-    <div
-      className="sn-sticker"
+    <div className="sn-sticker"
       style={{ left: sticker.x, top: sticker.y, fontSize: sticker.size, zIndex: sticker.zIndex || 50 }}
       onMouseDown={(e) => onDragStart(e, sticker.id, 'sticker')}
       onDoubleClick={() => onDelete(sticker.id)}
-      title="Drag · double-click to remove"
-    >
+      title="Drag · double-click to remove">
       {sticker.emoji}
     </div>
   );
@@ -248,12 +219,7 @@ export default function StickyNotesPage() {
     if (mode !== 'pan') return;
     if (['TEXTAREA', 'INPUT', 'BUTTON'].includes(e.target.tagName)) return;
     e.preventDefault();
-    panning.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      origLeft: boardRef.current.scrollLeft,
-      origTop:  boardRef.current.scrollTop,
-    };
+    panning.current = { startX: e.clientX, startY: e.clientY, origLeft: boardRef.current.scrollLeft, origTop: boardRef.current.scrollTop };
   }
 
   function handleBoardClick(e) {
@@ -269,11 +235,7 @@ export default function StickyNotesPage() {
     topZ.current += 1;
     if (mode === 'note') {
       const id = Date.now();
-      setNotes(prev => [...prev, {
-        id, x: x - 95, y: y - 90, text: '', author: '',
-        color: selectedColor, tape: selectedTape,
-        rotation: (Math.random() - 0.5) * 6, zIndex: topZ.current,
-      }]);
+      setNotes(prev => [...prev, { id, x: x - 95, y: y - 90, text: '', author: '', color: selectedColor, tape: selectedTape, rotation: (Math.random() - 0.5) * 6, zIndex: topZ.current }]);
       setJustCreated(id);
       setSelectedNote(id);
       setTimeout(() => setJustCreated(null), 200);
@@ -294,11 +256,8 @@ export default function StickyNotesPage() {
 
   function handleReset() {
     if (window.confirm('Clear all notes and restore the original board?')) {
-      localStorage.removeItem(LS_NOTES);
-      localStorage.removeItem(LS_STICKERS);
-      setNotes(SEED_NOTES);
-      setStickers(SEED_STICKERS);
-      setSelectedNote(null);
+      localStorage.removeItem(LS_NOTES); localStorage.removeItem(LS_STICKERS);
+      setNotes(SEED_NOTES); setStickers(SEED_STICKERS); setSelectedNote(null);
     }
   }
 
@@ -306,7 +265,6 @@ export default function StickyNotesPage() {
 
   return (
     <div className="fj-page">
-      {/* Board fills full viewport, topbar overlays it */}
       <div
         className={`fj-board${mode === 'select' ? ' fj-board--select' : ''}`}
         ref={boardRef}
@@ -317,23 +275,12 @@ export default function StickyNotesPage() {
         onMouseLeave={handleBoardMouseLeave}
       >
         <div className="fj-canvas">
-          <div className="fj-canvas-text" style={{ left: 80, top: 155 }}>
-            Leave me<br />a note
-          </div>
-          <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>
-            I’d love any book, movie, and show recommendations!
-          </div>
+          <div className="fj-canvas-text" style={{ left: 80, top: 155 }}>Leave me<br />a note</div>
+          <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>I’d love any book, movie, and show recommendations!</div>
           {notes.map(n => (
-            <StickyNote
-              key={n.id} note={n}
-              mode={mode}
-              isSelected={selectedNote === n.id}
-              onSelect={setSelectedNote}
-              onUpdate={handleUpdateNote}
-              onDelete={handleDeleteNote}
-              onDragStart={handleDragStart}
-              autoFocus={n.id === justCreated}
-            />
+            <StickyNote key={n.id} note={n} mode={mode} isSelected={selectedNote === n.id}
+              onSelect={setSelectedNote} onUpdate={handleUpdateNote} onDelete={handleDeleteNote}
+              onDragStart={handleDragStart} autoFocus={n.id === justCreated} />
           ))}
           {stickers.map(s => (
             <Sticker key={s.id} sticker={s} onDragStart={handleDragStart} onDelete={handleDeleteSticker} />
@@ -344,28 +291,15 @@ export default function StickyNotesPage() {
       {/* Topbar — transparent, floats over board */}
       <div className="fj-topbar">
         <div className="fj-topbar-left">
-          <div className="fj-nav-tools">
-            <button
-              className={`fj-nt-btn${mode === 'select' ? ' active' : ''}`}
-              onClick={() => { setMode('select'); setShowStickers(false); }}
-              title="Select"
-            ><CursorIcon /></button>
-            <button
-              className={`fj-nt-btn${mode === 'pan' ? ' active' : ''}`}
-              onClick={() => { setMode('pan'); setShowStickers(false); setSelectedNote(null); }}
-              title="Pan canvas"
-            ><HandIcon /></button>
-          </div>
-          <span className="fj-board-name-pill">Jaylene’s Board</span>
+          <span className="fj-pill">Jaylene’s Board</span>
         </div>
         <div className="fj-topbar-right">
           <button className="fj-reset-link" onClick={handleReset}>Reset board</button>
-          <div className="fj-avatar">JR</div>
-          <a className="fj-return-btn" href={PORTFOLIO_URL}>Return to Portfolio</a>
+          <span className="fj-pill fj-pill--avatar">JR</span>
+          <a className="fj-pill fj-pill--cta" href={PORTFOLIO_URL}>Return to Portfolio</a>
         </div>
       </div>
 
-      {/* Sticker picker */}
       {showStickers && (
         <div className="fj-sticker-tray">
           {STICKERS.map(em => (
@@ -379,8 +313,11 @@ export default function StickyNotesPage() {
 
       {/* Bottom toolbar */}
       <div className="fj-toolbar">
+        {/* Navigation tools */}
         <div className="tb-tools">
-          <button className={`tb-tool${mode === 'note'    ? ' active' : ''}`} onClick={() => { setMode('note');    setShowStickers(false); }} title="Add sticky note"><NoteIcon /></button>
+          <button className={`tb-tool${mode === 'select'  ? ' active' : ''}`} onClick={() => { setMode('select');  setShowStickers(false); }} title="Select"><CursorIcon /></button>
+          <button className={`tb-tool${mode === 'pan'     ? ' active' : ''}`} onClick={() => { setMode('pan');     setShowStickers(false); setSelectedNote(null); }} title="Pan canvas"><HandIcon /></button>
+          <button className={`tb-tool${mode === 'note'    ? ' active' : ''}`} onClick={() => { setMode('note');    setShowStickers(false); }} title="Add note"><NoteIcon /></button>
           <button className={`tb-tool${mode === 'sticker' ? ' active' : ''}`} onClick={() => setShowStickers(v => !v)} title="Add sticker"><StickerIcon /></button>
         </div>
         <div className="tb-sep" />
@@ -404,16 +341,15 @@ export default function StickyNotesPage() {
           </div>
         </div>
         <div className="tb-sep" />
-        <button className={`tb-post${mode === 'note' ? ' armed' : ''}`}
+        <button className="tb-post"
           onClick={() => { setMode(m => m === 'note' ? 'select' : 'note'); setShowStickers(false); }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Post note
+          Add note
         </button>
       </div>
 
-      {/* Visitor cursor — only in select mode */}
       {cursorPos && mode === 'select' && (
         <div className="fj-cursor" style={{ left: cursorPos.x, top: cursorPos.y }} aria-hidden="true">
           <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
