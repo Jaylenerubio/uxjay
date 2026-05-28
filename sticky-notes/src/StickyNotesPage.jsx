@@ -21,24 +21,19 @@ const TAPE_STYLES = [
   { id: 'kraft',  label: 'Kraft',  css: { background: '#D7CCC8' } },
 ];
 
-const TEXT_SIZES = [
-  { id: 'sm', label: 'S',  fontSize: 12, lineHeight: 1.65 },
-  { id: 'md', label: 'M',  fontSize: 15, lineHeight: 1.6  },
-  { id: 'lg', label: 'L',  fontSize: 19, lineHeight: 1.5  },
-  { id: 'xl', label: 'XL', fontSize: 24, lineHeight: 1.4  },
-];
-
 const STICKERS = ['🌟','🎉','❤️','🔥','✨','👏','🎨','💡','🚀','🌈','😊','💪','🙌','💐','🦋','⚡','🎯','🏆'];
 
+const CURSOR_COLORS = ['#7C3AED', '#DB2777', '#2563EB', '#059669', '#D97706', '#DC2626'];
+
 const SEED_NOTES = [
-  { id: 's1', x: 560,  y: 110, text: 'Friends — still the best comfort show ever made 💛', author: 'Mia T.', color: 'yellow', tape: 'clear', textSize: 'md', rotation: -2.5, zIndex: 1 },
-  { id: 's2', x: 850,  y: 80,  text: 'Wuthering Heights (2011) — Heathcliff will ruin you 🌿', author: 'Jake R.', color: 'pink', tape: 'yellow', textSize: 'md', rotation: 1.8, zIndex: 2 },
-  { id: 's3', x: 1130, y: 155, text: 'Book rec: The Secret History by Donna Tartt 📚 Absolutely haunting.', author: 'Sam K.', color: 'blue', tape: 'ocean', textSize: 'md', rotation: -1.2, zIndex: 3 },
-  { id: 's4', x: 620,  y: 360, text: 'Neighbors (2014) — funniest movie I have ever seen 😂', author: 'Morgan', color: 'green', tape: 'blush', textSize: 'md', rotation: 2.5, zIndex: 4 },
-  { id: 's5', x: 980,  y: 330, text: 'Severance on Apple TV+ — absolutely mind-bending 🧠', author: 'Taylor', color: 'purple', tape: 'forest', textSize: 'md', rotation: -3.0, zIndex: 5 },
-  { id: 's6', x: 1290, y: 310, text: 'Lessons in Chemistry — cannot put it down 🧪', author: 'Kai', color: 'orange', tape: 'kraft', textSize: 'sm', rotation: 0.8, zIndex: 6 },
-  { id: 's7', x: 760,  y: 490, text: 'Abbott Elementary 🍎 — the best comedy on TV right now!', author: 'Dana L.', color: 'yellow', tape: 'blush', textSize: 'md', rotation: -1.0, zIndex: 7 },
-  { id: 's8', x: 480,  y: 500, text: 'Movie: Everything Everywhere All at Once 🌌 Changed me forever.', author: 'Chris', color: 'blue', tape: 'forest', textSize: 'sm', rotation: 2.0, zIndex: 8 },
+  { id: 's1', x: 560,  y: 110, text: 'Friends — still the best comfort show ever made 💛', author: 'Mia T.',   color: 'yellow', tape: 'clear',  rotation: -2.5, zIndex: 1 },
+  { id: 's2', x: 850,  y: 80,  text: 'Wuthering Heights (2011) — Heathcliff will ruin you 🌿', author: 'Jake R.',  color: 'pink',   tape: 'yellow', rotation:  1.8, zIndex: 2 },
+  { id: 's3', x: 1130, y: 155, text: 'Book rec: The Secret History by Donna Tartt 📚 Absolutely haunting.', author: 'Sam K.',   color: 'blue',   tape: 'ocean',  rotation: -1.2, zIndex: 3 },
+  { id: 's4', x: 620,  y: 360, text: 'Neighbors (2014) — funniest movie I have ever seen 😂', author: 'Morgan',   color: 'green',  tape: 'blush',  rotation:  2.5, zIndex: 4 },
+  { id: 's5', x: 980,  y: 330, text: 'Severance on Apple TV+ — absolutely mind-bending 🧠', author: 'Taylor',   color: 'purple', tape: 'forest', rotation: -3.0, zIndex: 5 },
+  { id: 's6', x: 1290, y: 310, text: 'Lessons in Chemistry — cannot put it down 🧪', author: 'Kai',       color: 'orange', tape: 'kraft',  rotation:  0.8, zIndex: 6 },
+  { id: 's7', x: 760,  y: 490, text: 'Abbott Elementary 🍎 — the best comedy on TV right now!', author: 'Dana L.', color: 'yellow', tape: 'blush',  rotation: -1.0, zIndex: 7 },
+  { id: 's8', x: 480,  y: 500, text: 'Movie: Everything Everywhere All at Once 🌌 Changed me forever.', author: 'Chris',    color: 'blue',   tape: 'forest', rotation:  2.0, zIndex: 8 },
 ];
 
 const SEED_STICKERS = [
@@ -47,8 +42,8 @@ const SEED_STICKERS = [
   { id: 'ss3', x: 555,  y: 545, emoji: '💡', size: 30 },
 ];
 
-const LS_NOTES    = 'uxjay_sn_notes_v4';
-const LS_STICKERS = 'uxjay_sn_stickers_v4';
+const LS_NOTES    = 'uxjay_sn_notes_v5';
+const LS_STICKERS = 'uxjay_sn_stickers_v5';
 
 function persist(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 function restore(key, fallback) {
@@ -68,7 +63,6 @@ function StickerIcon() {
 
 function StickyNote({ note, isSelected, onSelect, onUpdate, onDelete, onDragStart, autoFocus }) {
   const colorObj = NOTE_COLORS.find(c => c.id === note.color) || NOTE_COLORS[0];
-  const sizeObj  = TEXT_SIZES.find(s => s.id === note.textSize) || TEXT_SIZES[1];
   const tapeCss  = (TAPE_STYLES.find(t => t.id === note.tape) || TAPE_STYLES[0]).css;
   const taRef    = useRef(null);
 
@@ -93,7 +87,6 @@ function StickyNote({ note, isSelected, onSelect, onUpdate, onDelete, onDragStar
         placeholder="Write something nice…"
         value={note.text}
         onChange={(e) => onUpdate(note.id, { text: e.target.value })}
-        style={{ fontSize: sizeObj.fontSize, lineHeight: sizeObj.lineHeight }}
         onMouseDown={(e) => e.stopPropagation()}
       />
       <div className="sn-footer">
@@ -130,10 +123,21 @@ export default function StickyNotesPage() {
   const [mode,          setMode]          = useState('select');
   const [selectedColor, setSelectedColor] = useState('yellow');
   const [selectedTape,  setSelectedTape]  = useState('clear');
-  const [selectedSize,  setSelectedSize]  = useState('md');
   const [showStickers,  setShowStickers]  = useState(false);
-  const [activeSticker, setActiveSticker] = useState('🌟');
+  const [activeSticker, setActiveSticker] = useState('✨');
   const [justCreated,   setJustCreated]   = useState(null);
+  const [cursorPos,     setCursorPos]     = useState(null);
+
+  const [visitorNum] = useState(() => {
+    try {
+      const stored = localStorage.getItem('uxjay_visitor_num');
+      if (stored) return parseInt(stored, 10);
+      const num = Math.floor(Math.random() * 900) + 100;
+      localStorage.setItem('uxjay_visitor_num', String(num));
+      return num;
+    } catch { return Math.floor(Math.random() * 900) + 100; }
+  });
+  const cursorColor = CURSOR_COLORS[visitorNum % CURSOR_COLORS.length];
 
   const boardRef = useRef(null);
   const dragging = useRef(null);
@@ -142,7 +146,6 @@ export default function StickyNotesPage() {
   useEffect(() => { persist(LS_NOTES,    notes);    }, [notes]);
   useEffect(() => { persist(LS_STICKERS, stickers); }, [stickers]);
 
-  // Global drag
   useEffect(() => {
     function onMove(e) {
       if (!dragging.current) return;
@@ -162,7 +165,6 @@ export default function StickyNotesPage() {
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, []);
 
-  // Keyboard delete
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key !== 'Delete' && e.key !== 'Backspace') return;
@@ -188,11 +190,8 @@ export default function StickyNotesPage() {
   }, [notes, stickers]);
 
   function handleBoardClick(e) {
-    // Deselect note when clicking board background
     const classes = Array.from(e.target.classList);
-    if (classes.some(c => ['fj-board', 'fj-canvas'].includes(c))) {
-      setSelectedNote(null);
-    }
+    if (classes.some(c => ['fj-board', 'fj-canvas'].includes(c))) setSelectedNote(null);
     if (mode === 'select') return;
     if (['TEXTAREA', 'INPUT', 'BUTTON'].includes(e.target.tagName)) return;
     if (!classes.some(c => ['fj-board', 'fj-canvas', 'fj-canvas-text'].includes(c))) return;
@@ -205,7 +204,7 @@ export default function StickyNotesPage() {
       const id = Date.now();
       setNotes(prev => [...prev, {
         id, x: x - 95, y: y - 90, text: '', author: '',
-        color: selectedColor, tape: selectedTape, textSize: selectedSize,
+        color: selectedColor, tape: selectedTape,
         rotation: (Math.random() - 0.5) * 6, zIndex: topZ.current,
       }]);
       setJustCreated(id);
@@ -215,6 +214,9 @@ export default function StickyNotesPage() {
       setStickers(prev => [...prev, { id: Date.now(), x: x - 20, y: y - 20, emoji: activeSticker, size: 36, zIndex: topZ.current }]);
     }
   }
+
+  function handleBoardMouseMove(e) { setCursorPos({ x: e.clientX, y: e.clientY }); }
+  function handleBoardMouseLeave() { setCursorPos(null); }
 
   function handleUpdateNote(id, changes) { setNotes(prev => prev.map(n => n.id === id ? { ...n, ...changes } : n)); }
   function handleDeleteNote(id)  { setNotes(prev => prev.filter(n => n.id !== id)); if (selectedNote === id) setSelectedNote(null); }
@@ -230,13 +232,11 @@ export default function StickyNotesPage() {
     }
   }
 
-  const boardCursor = mode === 'note' ? 'crosshair' : mode === 'sticker' ? 'cell' : 'default';
-
   return (
     <div className="fj-page">
       <div className="fj-topbar">
         <div className="fj-topbar-left">
-          <span className="fj-file-name">✦ Jaylen's Board</span>
+          <span className="fj-file-name">❆ Jaylen's Board</span>
           <span className="fj-note-count">{notes.length + stickers.length} items</span>
         </div>
         <div className="fj-topbar-right">
@@ -246,17 +246,21 @@ export default function StickyNotesPage() {
         </div>
       </div>
 
-      <div className="fj-board" ref={boardRef} style={{ cursor: boardCursor }} onClick={handleBoardClick}>
+      <div
+        className="fj-board"
+        ref={boardRef}
+        style={{ cursor: 'none' }}
+        onClick={handleBoardClick}
+        onMouseMove={handleBoardMouseMove}
+        onMouseLeave={handleBoardMouseLeave}
+      >
         <div className="fj-canvas">
-          {/* Heading — Space Grotesk */}
           <div className="fj-canvas-text" style={{ left: 80, top: 155 }}>
             Leave me<br />a note
           </div>
-          {/* Subtitle — Inter bold */}
           <div className="fj-canvas-hint" style={{ left: 84, top: 410 }}>
             I'd love any book, movie, and show recommendations!
           </div>
-
           {notes.map(n => (
             <StickyNote
               key={n.id} note={n}
@@ -287,9 +291,9 @@ export default function StickyNotesPage() {
 
       <div className="fj-toolbar">
         <div className="tb-tools">
-          <button className={`tb-tool${mode === 'select' ? ' active' : ''}`} onClick={() => { setMode('select'); setShowStickers(false); }} title="Select & drag"><CursorIcon /></button>
-          <button className={`tb-tool${mode === 'note'   ? ' active' : ''}`} onClick={() => { setMode('note');   setShowStickers(false); }} title="Add sticky note"><NoteIcon /></button>
-          <button className={`tb-tool${mode === 'sticker'? ' active' : ''}`} onClick={() => setShowStickers(v => !v)} title="Add sticker"><StickerIcon /></button>
+          <button className={`tb-tool${mode === 'select'  ? ' active' : ''}`} onClick={() => { setMode('select');  setShowStickers(false); }} title="Select &amp; drag"><CursorIcon /></button>
+          <button className={`tb-tool${mode === 'note'    ? ' active' : ''}`} onClick={() => { setMode('note');    setShowStickers(false); }} title="Add sticky note"><NoteIcon /></button>
+          <button className={`tb-tool${mode === 'sticker' ? ' active' : ''}`} onClick={() => setShowStickers(v => !v)} title="Add sticker"><StickerIcon /></button>
         </div>
         <div className="tb-sep" />
         <div className="tb-section">
@@ -312,24 +316,27 @@ export default function StickyNotesPage() {
           </div>
         </div>
         <div className="tb-sep" />
-        <div className="tb-section">
-          <span className="tb-label">Size</span>
-          <div className="tb-row">
-            {TEXT_SIZES.map(s => (
-              <button key={s.id} className={`tb-size${selectedSize === s.id ? ' active' : ''}`}
-                onClick={() => setSelectedSize(s.id)}>{s.label}</button>
-            ))}
-          </div>
-        </div>
-        <div className="tb-sep" />
         <button className={`tb-post${mode === 'note' ? ' armed' : ''}`}
           onClick={() => { setMode(m => m === 'note' ? 'select' : 'note'); setShowStickers(false); }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          {mode === 'note' ? 'Click the board…' : 'Post note'}
+          Post note
         </button>
       </div>
+
+      {cursorPos && (
+        <div
+          className="fj-cursor"
+          style={{ left: cursorPos.x, top: cursorPos.y }}
+          aria-hidden="true"
+        >
+          <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
+            <path d="M2 2L18 11L11 13L8 21L2 2Z" fill={cursorColor} stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
+          </svg>
+          <span className="fj-cursor-label" style={{ background: cursorColor }}>User{visitorNum}</span>
+        </div>
+      )}
     </div>
   );
 }
