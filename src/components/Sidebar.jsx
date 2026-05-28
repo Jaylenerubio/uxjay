@@ -1,12 +1,11 @@
 import { Icon } from './Icons';
 
 const NAV_ITEMS = [
-  { key: 'dashboard',    label: 'Dashboard',    icon: 'home'         },
-  { key: 'activity',     label: 'Activity',     icon: 'bell'         },
-  { key: 'clients',      label: 'Clients',      icon: 'group'        },
-  { key: 'documents',    label: 'Documents',    icon: 'documents'    },
-  { key: 'notices',      label: 'Notices',      icon: 'mail'         },
-  { key: 'sticky-notes', label: 'Leave a Note', icon: 'sticky-note'  },
+  { key: 'dashboard', label: 'Dashboard', icon: 'home'      },
+  { key: 'activity',  label: 'Activity',  icon: 'bell'      },
+  { key: 'clients',   label: 'Clients',   icon: 'group'     },
+  { key: 'documents', label: 'Documents', icon: 'documents' },
+  { key: 'notices',   label: 'Notices',   icon: 'mail'      },
 ];
 
 export default function Sidebar({ active, onNav }) {

@@ -6,7 +6,6 @@ import ClientsPage from './components/ClientsPage';
 import DocumentsPage from './components/DocumentsPage';
 import ClientDetail from './components/ClientDetail';
 import NoticesPage from './components/NoticesPage';
-import StickyNotesPage from './components/StickyNotesPage';
 
 export default function App() {
   const [page, setPage] = useState('dashboard');
@@ -25,11 +24,6 @@ export default function App() {
   function handleBack() {
     setPage('clients');
     setSelectedClientId(null);
-  }
-
-  // Sticky notes is full-screen — no sidebar
-  if (page === 'sticky-notes') {
-    return <StickyNotesPage onReturn={() => setPage('dashboard')} />;
   }
 
   function renderPage() {
