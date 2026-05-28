@@ -314,6 +314,32 @@ export const caseStudies = [
       { number: '100%', label: 'Stakeholder sign-off on final designs' }
     ],
     reflection: "Agency work taught me to make decisive calls quickly, communicate rationale clearly, and build systems that outlast the engagement. It also taught me the power of scope discipline — sometimes the most impactful design decision is knowing what not to build."
+  },
+  {
+    id: 'poverty-atlas',
+    title: 'NYC Poverty Atlas',
+    tagline: 'Data visualization for city-wide poverty mapping',
+    shortDesc: 'Redesigned the NYC Poverty Atlas — a public-facing data tool helping policymakers and advocates understand poverty patterns across New York City neighborhoods.',
+    editorialHeadline: 'Redesigning a public data tool to make NYC poverty data accessible to policymakers and advocates',
+    productDesc: 'The NYC Poverty Atlas is a public-facing data visualization tool that maps poverty indicators across all five boroughs, helping city planners and community advocates understand where resources are needed most.',
+    role: 'Senior Product Designer',
+    company: "NYC Mayor's Office for Economic Opportunity",
+    timeline: '2024 – Present',
+    team: 'Data Engineering, Policy Research, Communications',
+    tools: ['Figma', 'Miro', 'Airtable'],
+    tags: ['Data Visualization', 'Public Policy', 'Civic Tech'],
+    accentColor: '#F59E0B',
+    accentDark: '#D97706',
+    bgGradient: 'linear-gradient(135deg, #92400E 0%, #F59E0B 60%, #FCD34D 100%)',
+    metricPrimary: 'NYC',
+    metricLabel: 'city-wide poverty mapping',
+    metricSecondary: 'Public',
+    metricSecondaryLabel: 'policy tool',
+    comingSoon: true,
+    challenge: 'Coming soon.',
+    process: [],
+    results: [],
+    reflection: 'Coming soon.'
   }
 ];
 
@@ -338,9 +364,8 @@ export const about = {
   },
   stats: [
     { number: '2M+', label: 'New Yorkers using products I designed' },
-    { number: '83%', label: 'Engagement increase (My File NYC)' },
-    { number: '22%', label: 'Processing time reduction' },
     { number: '30+', label: 'Usability sessions conducted' },
+    { number: '14', label: 'Design critique sessions facilitated with stakeholders and team members' },
     { number: '4', label: 'Designers mentored & managed' }
   ],
   experience: [
@@ -371,6 +396,20 @@ export const about = {
       period: 'Jun 2021 – Aug 2022',
       location: 'Remote',
       highlight: 'Digital learning · Teacher development'
+    },
+    {
+      title: 'ELA Teacher',
+      company: 'Mott Haven Academy Charter School',
+      period: '2019 – 2022',
+      location: 'Bronx, NY',
+      highlight: 'Middle school English Language Arts'
+    },
+    {
+      title: 'English Teacher',
+      company: 'Barsanti Middle School',
+      period: '2018',
+      location: 'Florence, Italy',
+      highlight: 'English language instruction'
     }
   ],
   email: 'jaylenerubio1@gmail.com',

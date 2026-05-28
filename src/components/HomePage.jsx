@@ -76,9 +76,9 @@ function HeroSection() {
   return (
     <section className="hero canvas-bg">
       <div className="hero-floaters">
-        {/* FigJam cursor */}
-        <div className="floater" style={{ top: '54%', right: '36%', animation: 'float2 7s ease-in-out infinite 1s' }}>
-          <div className="figjam-cursor-group">
+        {/* Floating cursor — appears after frame is drawn */}
+        <div className="floater" style={{ top: '54%', right: '36%', animation: 'float2 7s ease-in-out infinite 2.2s', opacity: 0, animationFillMode: 'forwards' }}>
+          <div className="figjam-cursor-group" style={{ opacity: 0, animation: 'fadeIn 0.4s 2.1s ease forwards' }}>
             <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
               <path d="M2 2L15.5 10.5L9.5 12L6.5 19L2 2Z" fill="#6B7AFF" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
             </svg>
@@ -117,7 +117,7 @@ function HeroSection() {
           </button>
         </div>
 
-        {/* Heading with FigJam selection frame */}
+        {/* Heading with FigJam selection frame — cursor traces the border */}
         <div className="figjam-selection mb-24">
           <div className="sel-line sel-top" />
           <div className="sel-line sel-right" />
@@ -127,6 +127,12 @@ function HeroSection() {
           <div className="sel-corner sel-tr" />
           <div className="sel-corner sel-bl" />
           <div className="sel-corner sel-br" />
+          {/* Cursor that traces the frame perimeter */}
+          <div className="frame-tracer">
+            <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+              <path d="M2 2L15.5 10.5L9.5 12L6.5 19L2 2Z" fill="#6B7AFF" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+            </svg>
+          </div>
           <h1 className="display-xl" style={{ animation: 'fadeUp 0.6s 0.1s ease forwards', opacity: 0 }}>
             Sr. Product<br />Designer
           </h1>
@@ -154,7 +160,13 @@ function HeroSection() {
 function CaseStudyCard({ cs, onClick, index }) {
   return (
     <AnimBlock delay={(index % 2) + 1}>
-      <div className="cs-card" onClick={() => onClick(cs.id)}>
+      <div className="cs-card" onClick={() => !cs.comingSoon && onClick(cs.id)}
+        style={cs.comingSoon ? { cursor: 'default' } : {}}>
+        {cs.comingSoon && (
+          <div className="cs-card-coming-soon">
+            <span className="coming-soon-badge">Coming Soon</span>
+          </div>
+        )}
         <div className="cs-card-visual">
           <div
             className="cs-card-visual-bg"
@@ -348,17 +360,13 @@ function AboutSection() {
           </AnimBlock>
 
           <AnimBlock delay={2}>
-            <div style={{ marginTop: 40 }}>
-              <div
-                className="sticky sticky-lavender"
-                style={{
-                  fontSize: 17,
-                  padding: '20px 24px',
-                  display: 'block',
-                  lineHeight: 1.5,
-                  maxWidth: 320
-                }}
-              >
+            <div className="memoji-quote-wrap">
+              <img
+                src="/memoji.png"
+                alt="Jaylene's memoji"
+                className="memoji-img"
+              />
+              <div className="memoji-bubble">
                 "I came to design through education and psychology — I think about behavior before I open Figma."
               </div>
             </div>

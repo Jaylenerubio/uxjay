@@ -9,7 +9,14 @@ export default function Nav({ onHome, onWork, onAbout, currentPage }) {
       <button className="nav-link" onClick={onWork}>Work</button>
       <button className="nav-link" onClick={onAbout}>About</button>
       <div className="nav-sep" />
-      <a className="nav-cta" href="mailto:jaylenerubio1@gmail.com">Connect with me</a>
+      <a
+        className="nav-cta"
+        href="https://www.linkedin.com/in/jaylenerubio"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Contact me
+      </a>
     </nav>
   );
 }
