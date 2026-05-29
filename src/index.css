@@ -424,7 +424,7 @@ a, button, [role="button"], .cs-card, .cse-next-card, .nav-link, .nav-logo, .nav
   max-width: 340px;
 }
 
-/* ─── Coming soon card overlay ───────────────────────────────── */
+/* ─── Coming soon overlay: hidden by default, badge on hover ─── */
 .cs-card-coming-soon {
   position: absolute;
   inset: 0;
