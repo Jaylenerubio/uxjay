@@ -363,10 +363,22 @@ export const about = {
     'AI & Emerging': '#FF6B6B'
   },
   stats: [
-    { number: '2M+', label: 'New Yorkers using products I designed' },
-    { number: '30+', label: 'Usability sessions conducted' },
-    { number: '14', label: 'Design critique sessions facilitated with stakeholders and team members' },
-    { number: '4', label: 'Designers mentored & managed' }
+    { number: '2M+', label: 'Residents using our products', context: 'w/ outreach' },
+    { number: '36', label: 'Usability sessions conducted', context: 'w/ releases' },
+    { number: '6', label: 'Designers mentored & managed', context: 'w/ partnerships' },
+    { number: '26', label: 'Facilitated design sessions', context: 'w/ projects' }
+  ],
+  inOfficeSkills: {
+    'UX/Product Design': ['Systems Thinking', 'User Research', 'UX Strategy', '0→1 Design', 'Stakeholder Alignment', 'Design Facilitation', 'Component Libraries', 'Rapid Prototyping'],
+    'Tools': ['Figma AI', 'Framer AI', 'Claude Code', 'UserTesting', 'Storybook', 'Cursor', 'Loveable']
+  },
+  personalBio: "I'm a daughter and wife that loves to cook and bake random desserts I find on the internet. I'm also in love with anything travel — it has always inspired me. I've traveled to over 30 countries, and those experiences continually remind me that, no matter where we're from, we share more similarities than differences. I'm currently training for the NYC marathon in November — it's become my entire personality.",
+  personalFacts: ['Left-handed', 'Fluent in Spanish', 'Long Distance Runner', 'Avid True Crimer', 'Eldest daughter', 'Hilarious', 'Mid-Tier Baker', 'Coffee Obsessed', 'Curious'],
+  lifeNumbers: [
+    { number: '34', label: 'Countries traveled', context: 'indefinitely' },
+    { number: '2,567', label: 'Miles ran through races', context: 'every race' },
+    { number: '6', label: 'Books read in 2026', context: 'every year' },
+    { number: '12', label: 'Websites vibe-coded', context: 'w/ practice' }
   ],
   experience: [
     {
