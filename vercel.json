@@ -1,6 +1,3 @@
 {
-  "rewrites": [
-    { "source": "/zodiac-fortune-cookie.html", "destination": "/zodiac-fortune-cookie.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
