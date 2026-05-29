@@ -162,16 +162,16 @@ function CaseStudyCard({ cs, onClick, index }) {
     <AnimBlock delay={(index % 2) + 1}>
       <div className="cs-card" onClick={() => !cs.comingSoon && onClick(cs.id)}
         style={cs.comingSoon ? { cursor: 'default' } : {}}>
-        {cs.comingSoon && (
-          <div className="cs-card-coming-soon">
-            <span className="coming-soon-badge">Coming Soon</span>
-          </div>
-        )}
         <div className="cs-card-visual">
           <div
             className="cs-card-visual-bg"
             style={{ background: cs.bgGradient }}
           />
+          {cs.comingSoon && (
+            <div className="cs-card-coming-soon">
+              <span className="coming-soon-badge">Coming Soon</span>
+            </div>
+          )}
           {/* Sticky metric overlaid on visual */}
           <div className="cs-card-metric">
             <div
