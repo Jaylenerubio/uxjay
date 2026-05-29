@@ -6,8 +6,14 @@ import ClientsPage from './components/ClientsPage';
 import DocumentsPage from './components/DocumentsPage';
 import ClientDetail from './components/ClientDetail';
 import NoticesPage from './components/NoticesPage';
+import ZodiacFortunePage from './components/ZodiacFortunePage';
+
+if (window.location.pathname === '/zodiac') {
+  document.title = 'Zodiac Fortune Cookie';
+}
 
 export default function App() {
+  if (window.location.pathname === '/zodiac') return <ZodiacFortunePage />;
   const [page, setPage] = useState('dashboard');
   const [selectedClientId, setSelectedClientId] = useState(null);
 
