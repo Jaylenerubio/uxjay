@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX Team Sync</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1F2D5A;
+    --navy-mid: #2E5EA8;
+    --navy-light: #E6F1FB;
+    --cream: #FFFFFF;
+    --white: #FFFFFF;
+    --text: #1a1a1a;
+    --text-mid: #555;
+    --text-light: #888;
+    --border: rgba(0,0,0,0.08);
+    --green-bg: #E8F5EE; --green-text: #1a6b3c; --green-border: #7dc9a0;
+    --amber-bg: #FEF3E2; --amber-text: #92520a; --amber-border: #f5bc6a;
+    --red-bg: #FDEAEA; --red-text: #8b1f1f; --red-border: #f09090;
+    --blue-bg: #E6F1FB; --blue-text: #185FA5; --blue-border: #85B7EB;
+    --purple-bg: #EEEDFE; --purple-text: #534AB7; --purple-border: #AFA9EC;
+    --teal-bg: #E1F5EE; --teal-text: #0F6E56; --teal-border: #5DCAA5;
+    --coral-bg: #FAECE7; --coral-text: #993C1D; --coral-border: #F0997B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Public Sans', sans-serif; background: #FFFFFF; color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--navy); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { font-family: 'Public Sans', sans-serif; color: white; font-size: 18px; letter-spacing: -0.02em; }
+  .nav-brand span { color: #85B7EB; font-style: italic; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.6); transition: all 0.2s; }
+  .nav-tab.active { background: rgba(255,255,255,0.15); color: white; }
+  .nav-tab:hover:not(.active) { color: rgba(255,255,255,0.85); }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* FORM PAGE */
+  .form-page { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem; }
+  .form-header { margin-bottom: 2.5rem; }
+  .form-header h1 { font-family: 'Public Sans', sans-serif; font-size: 36px; color: var(--navy); letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 8px; }
+  .form-header p { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+  .sync-date-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--navy-light); color: var(--navy-mid); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+
+  /* MEMBER SELECTOR */
+  .member-select { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 2rem; }
+  .member-btn { padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: white; cursor: pointer; text-align: left; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+  .member-btn:hover:not(.selected) { background: #F5F5F5; border-color: #DDDDDD; }
+  .member-btn.selected { border-color: var(--navy); background: var(--navy); }
+  .member-btn.selected .mb-name { color: white; }
+  .mb-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .mb-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+  /* FORM FIELDS */
+  .form-section { background: white; border-radius: 16px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1rem; }
+  .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 1rem; }
+  .field { margin-bottom: 1.25rem; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .field textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Public Sans', sans-serif; color: var(--text); background: #FFFFFF; resize: vertical; min-height: 70px; transition: border-color 0.15s; outline: none; line-height: 1.5; }
+  .field textarea:focus { border-color: var(--navy-mid); background: white; }
+  .field textarea::placeholder { color: var(--text-light); }
+
+  /* CHIPS */
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; user-select: none; }
+  .chip-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+  .chip-green:hover:not(.selected-green) { background: #CDE9D8; border-color: #CDE9D8; }
+  .chip-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
+  .chip-amber:hover:not(.selected-amber) { background: #FDEACC; border-color: #FDEACC; }
+  .chip-red { background: var(--red-bg); color: var(--red-text); border-color: var(--red-border); }
+  .chip-red:hover:not(.selected-red) { background: #F9D5D5; border-color: #F9D5D5; }
+  .chip-neutral { background: white; color: var(--text-mid); border-color: var(--border); }
+  .chip-neutral:hover:not(.selected-neutral) { background: #F5F5F5; border-color: #F5F5F5; }
+  .chip-neutral.selected, .chip-blue { background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-border); }
+  .chip.dimmed { opacity: 0.3; }
+  .chip.selected-green { background: var(--green-bg); color: var(--green-text); border-color: var(--green-text); box-shadow: 0 0 0 2px var(--green-border); }
+  .chip.selected-amber { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-text); box-shadow: 0 0 0 2px var(--amber-border); }
+  .chip.selected-red { background: var(--red-bg); color: var(--red-text); border-color: var(--red-text); box-shadow: 0 0 0 2px var(--red-border); }
+  .chip.selected-neutral { background: var(--blue-bg); color: var(--blue-text); border-color: var(--blue-text); box-shadow: 0 0 0 2px var(--blue-border); }
+
+  /* PROCESS STAGES */
+  .process-stages { display: flex; gap: 6px; flex-wrap: wrap; }
+  .stage-chip { padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1.5px solid var(--border); background: white; color: var(--text-mid); transition: all 0.15s; }
+  .stage-chip:hover:not(.active) { background: #F5F5F5; border-color: #F5F5F5; }
+  .stage-chip.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  /* TWO COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* SUBMIT */
+  .submit-btn { width: 100%; padding: 14px; background: var(--navy); color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; font-family: 'Public Sans', sans-serif; cursor: pointer; margin-top: 1.5rem; transition: all 0.2s; letter-spacing: 0.01em; }
+  .submit-btn:hover { background: var(--navy-mid); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* SUCCESS STATE */
+  .success-state { display: none; text-align: center; padding: 3rem 2rem; background: white; border-radius: 16px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+  .success-icon { font-size: 56px; margin-bottom: 1rem; display: block; animation: hornBounce 0.6s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+  @keyframes hornBounce { 0%{transform:scale(0.5) rotate(-20deg);opacity:0} 60%{transform:scale(1.15) rotate(5deg)} 100%{transform:scale(1) rotate(0deg);opacity:1} }
+  .success-state h2 { font-family: 'Public Sans', sans-serif; font-size: 26px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+  .success-state p { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+  .success-btn { margin-top: 1.5rem; padding: 10px 24px; background: transparent; border: 1.5px solid var(--navy); color: var(--navy); border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Public Sans', sans-serif; }
+  .confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+
+  /* DASHBOARD PAGE */
+  .dash-page { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .dash-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; }
+  .dash-header h1 { font-family: 'Public Sans', sans-serif; font-size: 32px; color: var(--navy); letter-spacing: -0.02em; }
+  .dash-header p { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
+  .refresh-btn { padding: 8px 16px; background: white; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-mid); font-family: 'Public Sans', sans-serif; transition: all 0.15s; }
+  .refresh-btn:hover { border-color: var(--navy-mid); color: var(--navy-mid); }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .stat-card { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 1rem 1.25rem; }
+  .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 4px; }
+  .stat-value { font-family: 'Public Sans', sans-serif; font-size: 28px; color: var(--navy); }
+  .stat-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  /* SHOW TELL BANNER */
+  .show-tell-banner { background: #FDF0F0; border: 1.5px solid #F5D0D0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: none; }
+  .show-tell-banner h3 { font-size: 13px; font-weight: 600; color: #8B3A3A; margin-bottom: 8px; display:flex;align-items:center;gap:6px; }
+  .show-tell-item { font-size: 13px; color: #333; padding: 6px 0; border-bottom: 1px solid #F0D0D0; line-height:1.5; }
+  .show-tell-item:last-child { border-bottom: none; }
+  .show-tell-item strong { color: #8B3A3A; }
+  .show-tell-calendar { font-size:11px;color:#999;margin-top:3px; }
+
+  /* SUBMISSION CARDS */
+  .submissions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .sub-card { background: white; border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+  .sub-card-header { padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  .sub-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+  .sub-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sub-role { font-size: 11px; color: var(--text-light); }
+  .sub-status { margin-left: auto; }
+  .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .status-green { background: var(--green-bg); color: var(--green-text); }
+  .status-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .status-red { background: var(--red-bg); color: var(--red-text); }
+  .sub-body { padding: 14px 16px; }
+  .sub-field { margin-bottom: 10px; }
+  .sub-field:last-child { margin-bottom: 0; }
+  .sub-field-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-light); margin-bottom: 3px; }
+  .sub-field-value { font-size: 12px; color: var(--text); line-height: 1.5; }
+  .sub-stage { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; background: var(--navy-light); color: var(--navy-mid); font-weight: 500; }
+  .sub-help { background: var(--amber-bg); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--amber-text); }
+  .sub-date { font-size: 11px; color: var(--text-light); margin-top: 8px; }
+
+  /* EMPTY / LOADING */
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); }
+  .empty-state p { font-size: 14px; margin-top: 8px; }
+  .loading { text-align: center; padding: 3rem; color: var(--text-light); font-size: 13px; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filter-chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: white; color: var(--text-mid); transition: all 0.15s; }
+  .filter-chip.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .filter-chip:hover:not(.active) { background: #F5F5F5; }
+
+  /* COLLAB MAP */
+  .collab-map-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #EEEEEE; background: white; padding: 1rem; margin-bottom: 1.5rem; }
+
+  /* MULTISELECT DROPDOWN — NYCO spec */
+  .multiselect-wrapper { position: relative; display: inline-flex; width: 280px; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .multiselect-trigger { width: 280px; box-sizing: border-box; padding: 8px 10px; background: white; border-radius: 8px; outline: 1px solid #DDDDDD; outline-offset: -1px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; gap: 8px; min-height: 42px; flex-wrap: wrap; }
+  .multiselect-trigger:hover { outline-color: #AAAAAA; }
+  .trigger-inner { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; min-width: 0; padding: 0 4px; }
+  .trigger-right { flex-shrink: 0; display: flex; align-items: center; }
+  .trigger-caret { display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+  .trigger-caret.open { transform: rotate(180deg); }
+  #multiselect-placeholder { color: #767676; font-size: 13px; font-family: 'Public Sans', sans-serif; font-weight: 400; line-height: 20px; white-space: nowrap; }
+  .selected-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 10px; background: #191919; color: white; border-radius: 20px; font-size: 12px; font-family: 'Public Sans', sans-serif; white-space: nowrap; }
+  .selected-tag button { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 0 3px; }
+  .selected-tag button:hover { color: white; }
+  .multiselect-selected { display: none; }
+  .multiselect-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; width: 280px; max-height: 256px; padding: 8px; background: white; box-shadow: 0px 4px 15px rgba(25,25,25,0.15); border-radius: 12px; z-index: 200; overflow-y: auto; box-sizing: border-box; flex-direction: column; }
+  .multiselect-dropdown.open { display: flex; }
+  .dropdown-option { width: 100%; min-height: 40px; padding: 8px 4px 8px 16px; border-radius: 6px; display: flex; align-items: center; cursor: pointer; box-sizing: border-box; }
+  .dropdown-option:hover { background: #F5F5F5; }
+  .dropdown-option-inner { flex: 1; display: flex; justify-content: space-between; align-items: center; }
+  .dropdown-option-label { color: #191919; font-size: 13px; font-family: 'Public Sans', sans-serif; font-weight: 400; line-height: 20px; }
+  .opt-check { opacity: 0; flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+  .dropdown-option.selected .opt-check { opacity: 1; }
+  .dropdown-other { border-top: 1px solid #EEEEEE; margin-top: 4px; }
+  .dropdown-other .dropdown-option-label { color: #767676; font-style: italic; }
+
+  /* CAPACITY SLIDER */
+  .capacity-section { margin-top: 0; }
+  .capacity-slider-wrap { position: relative; padding-bottom: 28px; }
+  .capacity-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #E0E0E0; outline: none; cursor: pointer; transition: background 0.1s; }
+  .capacity-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #1F2D5A; cursor: pointer; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .capacity-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #1F2D5A; cursor: pointer; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .capacity-labels { display: flex; justify-content: space-between; margin-top: 8px; }
+  .capacity-label { font-size: 11px; color: var(--text-light); }
+  .capacity-value-display { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+  .capacity-pill { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .capacity-pill.have { background: var(--green-bg); color: var(--green-text); }
+  .capacity-pill.slightly { background: var(--amber-bg); color: var(--amber-text); }
+  .capacity-pill.over { background: var(--red-bg); color: var(--red-text); }
+
+  /* 2px padding between labels and chips */
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 8px; padding-bottom: 2px; }
+  .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 1rem; padding-bottom: 2px; }
+
+  /* CAPACITY ALERT */
+  .capacity-alert { display: none; margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+  .capacity-alert.slightly { background: var(--amber-bg); color: var(--amber-text); display: block; }
+  .capacity-alert.over { background: var(--red-bg); color: var(--red-text); display: block; }
+
+  @media (max-width: 600px) {
+    .member-select, .two-col, .submissions-grid, .stats-row { grid-template-columns: 1fr; }
+    .form-header h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<canvas class="confetti-canvas" id="confetti-canvas"></canvas>
+
+<nav>
+  <div class="nav-brand">UX <span>Sync</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('form')">Submit update</button>
+    <button class="nav-tab" onclick="showPage('dashboard'); loadDashboard();">Team dashboard</button>
+  </div>
+</nav>
+
+<!-- FORM PAGE -->
+<div class="page active" id="page-form">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="sync-date-badge">📅 <span id="sync-date-label"></span></div>
+      <h1>Bi-weekly<br>team sync</h1>
+      <p>Fill out your update before each sync. Be specific — this helps the team know exactly where they can jump in.</p>
+    </div>
+
+    <div id="form-content">
+      <!-- MEMBER SELECT -->
+      <div class="form-section">
+        <div class="section-title">Who are you?</div>
+        <div class="member-select" id="member-select"></div>
+      </div>
+
+      <!-- CAPACITY -->
+      <div class="form-section">
+        <div class="section-title">Capacity check</div>
+        <div class="field capacity-section">
+          <label>How are you feeling about your current workload?</label>
+          <div class="capacity-slider-wrap">
+            <input type="range" class="capacity-slider" id="capacity-slider" min="1" max="4" step="0.01" oninput="updateCapacity(this.value)">
+            <div class="capacity-labels">
+              <span class="capacity-label">Have capacity</span>
+              <span class="capacity-label">Over capacity</span>
+            </div>
+          </div>
+          <div class="capacity-value-display">
+            <span id="capacity-pill" style="font-size:13px;font-weight:500;"></span>
+          </div>
+          <div class="capacity-alert" id="capacity-alert"></div>
+        </div>
+      </div>
+
+      <!-- WORK -->
+      <div class="form-section">
+        <div class="section-title">Your work</div>
+        <div class="field">
+          <label>What project / product are you currently working on?</label>
+          <div class="multiselect-wrapper" id="product-multiselect">
+            <div class="multiselect-trigger" id="multiselect-trigger" onclick="toggleDropdown()">
+              <div class="trigger-inner">
+                <span id="multiselect-placeholder">Select one or more products…</span>
+                <span id="selected-tags-inline"></span>
+              </div>
+              <div class="trigger-right">
+                <div class="trigger-caret" id="dropdown-arrow">
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5L6 6.5L11 1.5" stroke="#191919" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="multiselect-selected" id="selected-tags"></div>
+            <div class="multiselect-dropdown" id="product-dropdown">
+              <div class="dropdown-option" onclick="toggleOption(this,'Workforce Data Portal')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Workforce Data Portal</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'Poverty Atlas')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Poverty Atlas</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'Equity NYC')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Equity NYC</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'My File')"><div class="dropdown-option-inner"><span class="dropdown-option-label">My File</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'ACCESS NYC')"><div class="dropdown-option-inner"><span class="dropdown-option-label">ACCESS NYC</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'CUNY Cares Integration')"><div class="dropdown-option-inner"><span class="dropdown-option-label">CUNY Cares Integration</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'Benefits API Screener')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Benefits API Screener</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'Dohmh')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Dohmh</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'Component Library')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Component Library</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option" onclick="toggleOption(this,'MFA HPD / My File')"><div class="dropdown-option-inner"><span class="dropdown-option-label">MFA HPD / My File</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+              <div class="dropdown-option dropdown-other" onclick="toggleOption(this,'Other')"><div class="dropdown-option-inner"><span class="dropdown-option-label">Other</span><span class="opt-check"><svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 6L6 11L15 1" stroke="#191919" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+            </div>
+          </div>
+          <div id="other-product-field" style="display:none; margin-top:8px;">
+            <textarea id="other-product-text" placeholder="Please specify…" style="min-height:45px;"></textarea>
+          </div>
+        </div>
+        <div class="field">
+          <label>What specifically are you working on?</label>
+          <textarea id="working-on" placeholder="What are you focused on right now within that product?"></textarea>
+        </div>
+        <div class="field">
+          <label>Where are you in the process?</label>
+          <div class="process-stages" id="process-stages">
+            <div class="stage-chip" onclick="toggleStage(this)">Discovery</div>
+            <div class="stage-chip" onclick="toggleStage(this)">Research</div>
+            <div class="stage-chip" onclick="toggleStage(this)">IA / Wireframes</div>
+            <div class="stage-chip" onclick="toggleStage(this)">Design</div>
+            <div class="stage-chip" onclick="toggleStage(this)">Review</div>
+            <div class="stage-chip" onclick="toggleStage(this)">Handoff</div>
+            <div class="stage-chip" onclick="toggleStage(this)">Testing</div>
+            <div class="stage-chip" onclick="toggleStage(this)">Done</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS -->
+      <div class="form-section">
+        <div class="section-title">Status</div>
+        <div class="field">
+          <label>How are things going?</label>
+          <div class="chips" id="status-chips">
+            <div class="chip chip-green" onclick="selectStatus(this,'On track','green')">On track</div>
+            <div class="chip chip-amber" onclick="selectStatus(this,'Needs support','amber')">Needs support</div>
+            <div class="chip chip-red" onclick="selectStatus(this,'Blocked','red')">Blocked</div>
+          </div>
+        </div>
+        <div id="needs-support-section" style="display:none; margin-top:1rem;">
+          <div class="field" style="margin-bottom:0;">
+            <label>What support do you need?</label>
+            <textarea id="team-help" placeholder="Describe what you need and when — the more specific, the easier it is for the team to help." style="min-height:70px;"></textarea>
+            <input type="hidden" id="support-by" value="">
+          </div>
+        </div>
+        <div id="blocked-section" style="display:none; margin-top:1rem;">
+          <div class="field" style="margin-bottom:0;">
+            <label style="color:#8b1f1f;">You selected blocked — please explain</label>
+            <textarea id="blocked-reason" placeholder="What's blocking you? Who or what do you need to unblock this?" style="min-height:70px; border-color:#f09090; background:#FDEAEA;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHOW & TELL -->
+      <div class="form-section">
+        <div class="section-title">Show & tell / design critique</div>
+        <div class="field">
+          <label>Do you have work to share this month?</label>
+          <div class="chips" id="share-chips">
+            <div class="chip chip-neutral" onclick="selectShare(this,'Yes','neutral')">Yes, I have something to share</div>
+            <div class="chip chip-neutral" onclick="selectShare(this,'Not this month','neutral')">Not this month</div>
+          </div>
+        </div>
+        <div class="field" id="share-detail" style="display:none;">
+          <label>What would you like to share?</label>
+          <textarea id="share-detail-text" placeholder="Describe what you'd like to present or get feedback on…"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="submitForm()">Submit update →</button>
+    </div>
+
+    <div class="success-state" id="success-state">
+      <div class="success-icon">✦</div>
+      <h2>Update submitted</h2>
+      <p>Your team can now see your update on the dashboard.</p>
+      <button class="success-btn" onclick="resetForm()">Submit another update</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="page" id="page-dashboard">
+  <div class="dash-page">
+    <div class="dash-header">
+      <div>
+        <h1>Team dashboard</h1>
+        <p id="dash-subtitle">Latest sync updates from the team</p>
+      </div>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+    </div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Submitted</div>
+        <div class="stat-names" id="stat-submitted">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Needs support</div>
+        <div class="stat-names" id="stat-support">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Show & tell</div>
+        <div class="stat-names" id="stat-show">—</div>
+      </div>
+    </div>
+
+    <div class="show-tell-banner" id="show-tell-banner">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:18px;">🎉</span>
+        <span style="font-size:13px;font-weight:600;color:#92520a;">Time for a show & tell!</span>
+        <span style="margin-left:auto;font-size:11px;color:#B8860B;background:#FEF3CC;padding:2px 8px;border-radius:20px;font-weight:500;">📅 Look out for a calendar invite</span>
+      </div>
+      <div id="show-tell-items"></div>
+    </div>
+
+    <div class="date-filter-bar" id="date-filter-bar" style="display:none;">
+      <span style="font-size:12px;font-weight:500;color:#888;margin-right:8px;">Sync period</span>
+      <div id="date-range-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+
+    <div id="dashboard-content">
+      <div class="loading">Loading team updates…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Token stored in localStorage so it's never committed to the repo.
+// On first visit, the user is prompted to enter their Airtable PAT.
+function getAirtableToken() {
+  let t = localStorage.getItem('ux_sync_airtable_token');
+  if (!t) {
+    t = prompt('Enter your Airtable Personal Access Token to continue:');
+    if (t) localStorage.setItem('ux_sync_airtable_token', t.trim());
+  }
+  return t ? t.trim() : '';
+}
+const AIRTABLE_TOKEN = getAirtableToken();
+const BASE_ID = 'app1m9FE74INmOcrB';
+const TABLE_NAME = 'UX Team Sync';
+
+const TEAM = [
+  { name:'Jaylene Rubio', role:'Associate Director, Product Design', initials:'JR', bg:'#E6F1FB', text:'#185FA5' },
+  { name:'Jack Ding', role:'Sr. UX Researcher', initials:'JD', bg:'#E1F5EE', text:'#0F6E56' },
+  { name:'Juliana Lai', role:'Content Designer', initials:'JL', bg:'#EEEDFE', text:'#534AB7' },
+  { name:'Jack Shugrue', role:'UI Designer', initials:'JS', bg:'#FAECE7', text:'#993C1D' },
+];
+
+let selectedMember = null;
+let selectedStatus = null;
+let selectedShare = null;
+let selectedStages = [];
+let selectedProducts = [];
+let allRecords = [];
+
+function getInitials(name) {
+  return TEAM.find(m => m.name === name)?.initials || name.split(' ').map(n=>n[0]).join('').slice(0,2);
+}
+function getMemberStyle(name) {
+  return TEAM.find(m => m.name === name) || { bg:'#F1EFE8', text:'#5F5E5A' };
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function buildMemberSelect() {
+  const el = document.getElementById('member-select');
+  TEAM.forEach((m, i) => {
+    const btn = document.createElement('div');
+    btn.className = 'member-btn';
+    btn.innerHTML = `<div class="mb-avatar" style="background:${m.bg};color:${m.text};">${m.initials}</div><div><div class="mb-name">${m.name}</div></div>`;
+    btn.onclick = () => {
+      document.querySelectorAll('.member-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedMember = m.name;
+    };
+    el.appendChild(btn);
+  });
+}
+
+function setSyncDate() {
+  const today = new Date();
+  const options = { weekday:'long', month:'long', day:'numeric', year:'numeric' };
+  document.getElementById('sync-date-label').textContent = today.toLocaleDateString('en-US', options);
+}
+
+function toggleStage(el) {
+  el.classList.toggle('active');
+  const stage = el.textContent;
+  if (el.classList.contains('active')) {
+    if (!selectedStages.includes(stage)) selectedStages.push(stage);
+  } else {
+    selectedStages = selectedStages.filter(s => s !== stage);
+  }
+}
+
+let dropdownOpen = false;
+
+function toggleDropdown() {
+  dropdownOpen = !dropdownOpen;
+  const dd = document.getElementById('product-dropdown');
+  const trigger = document.querySelector('.multiselect-trigger');
+  const arrow = document.getElementById('dropdown-arrow');
+  dd.classList.toggle('open', dropdownOpen);
+  trigger.classList.toggle('open', dropdownOpen);
+  arrow.classList.toggle('open', dropdownOpen);
+}
+
+function toggleOption(el, value) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!selectedProducts.includes(value)) selectedProducts.push(value);
+  } else {
+    selectedProducts = selectedProducts.filter(p => p !== value);
+  }
+  updateSelectedTags();
+  if (value === 'Other') {
+    document.getElementById('other-product-field').style.display = el.classList.contains('selected') ? 'block' : 'none';
+  }
+}
+
+function removeProduct(value) {
+  selectedProducts = selectedProducts.filter(p => p !== value);
+  const opts = document.querySelectorAll('.dropdown-option');
+  opts.forEach(o => { if (o.textContent.trim().replace('✓','').trim() === value) o.classList.remove('selected'); });
+  if (value === 'Other') document.getElementById('other-product-field').style.display = 'none';
+  updateSelectedTags();
+}
+
+function updateSelectedTags() {
+  const inline = document.getElementById('selected-tags-inline');
+  const placeholder = document.getElementById('multiselect-placeholder');
+  if (selectedProducts.length === 0) {
+    inline.innerHTML = '';
+    placeholder.style.display = '';
+    return;
+  }
+  placeholder.style.display = 'none';
+  const first = selectedProducts[0];
+  const extra = selectedProducts.length > 1 ? ` +${selectedProducts.length - 1}` : '';
+  inline.innerHTML = `<span style="color:#191919;font-size:13px;font-family:'Public Sans',sans-serif;font-weight:400;">${first}${extra}</span>`;
+}
+
+function removeAllProducts() {
+  selectedProducts = [];
+  document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('other-product-field').style.display = 'none';
+  updateSelectedTags();
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#product-multiselect') && dropdownOpen) {
+    dropdownOpen = false;
+    document.getElementById('product-dropdown').classList.remove('open');
+    document.querySelector('.multiselect-trigger').classList.remove('open');
+    document.getElementById('dropdown-arrow').classList.remove('open');
+  }
+});
+
+function selectStatus(el, value, type) {
+  document.querySelectorAll('#status-chips .chip').forEach(c => {
+    c.classList.remove('selected-green','selected-amber','selected-red');
+  });
+  el.classList.add('selected-' + type);
+  selectedStatus = value;
+  document.getElementById('needs-support-section').style.display = value === 'Needs support' ? 'block' : 'none';
+  document.getElementById('blocked-section').style.display = value === 'Blocked' ? 'block' : 'none';
+  if (value !== 'Needs support') { document.getElementById('team-help').value = ''; document.getElementById('support-by').value = ''; }
+  if (value !== 'Blocked') { document.getElementById('blocked-reason').value = ''; }
+}
+
+function selectShare(el, value, type) {
+  document.querySelectorAll('#share-chips .chip').forEach(c => c.classList.remove('selected-neutral'));
+  el.classList.add('selected-neutral');
+  selectedShare = value;
+  document.getElementById('share-detail').style.display = value === 'Yes' ? 'block' : 'none';
+}
+
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = [];
+  const colors = ['#1F2D5A','#2E5EA8','#E6F1FB','#F9D5D5','#FEF3E2','#E8F5EE','#EEEDFE','#FAECE7','#FFD700','#FF6B6B','#4ECDC4'];
+  const shapes = ['rect','circle','strip'];
+
+  for (let i = 0; i < 160; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      shape: shapes[Math.floor(Math.random() * shapes.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: Math.random() * 4 + 2,
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 8,
+      opacity: 1,
+    });
+  }
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rotation += p.rotationSpeed;
+      if (frame > 80) p.opacity -= 0.008;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'circle') {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (p.shape === 'strip') {
+        ctx.fillRect(-p.h / 2, -p.w, p.h, p.w * 2);
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.restore();
+    });
+    frame++;
+    if (frame < 160) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+}
+
+function showError(msg) {
+  let el = document.getElementById('form-error');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'form-error';
+    el.style.cssText = 'background:#FDEAEA;color:#8b1f1f;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;border:1px solid #f09090;';
+    document.querySelector('.submit-btn').insertAdjacentElement('beforebegin', el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearError() {
+  const el = document.getElementById('form-error');
+  if (el) el.style.display = 'none';
+}
+
+async function submitForm() {
+  const workingOn = document.getElementById('working-on').value.trim();
+  const capacityLabel = document.getElementById('capacity-pill').textContent.trim();
+
+  if (!selectedMember) { showError('Please select your name.'); return; }
+  if (selectedProducts.length === 0) { showError('Please select at least one product or project.'); return; }
+  if (!workingOn) { showError('Please tell us what you are working on.'); return; }
+  if (selectedStages.length === 0) { showError('Please select where you are in the process.'); return; }
+  if (!selectedStatus) { showError('Please select a status.'); return; }
+  if (!capacityLabel) { showError('Please set your capacity level using the slider.'); return; }
+
+  clearError();
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const member = TEAM.find(m => m.name === selectedMember);
+  const fields = {
+    'Name': selectedMember,
+    'Role': member?.role || '',
+    'Products': selectedProducts.includes('Other') ? selectedProducts.filter(p=>p!=='Other').concat(document.getElementById('other-product-text').value ? ['Other: ' + document.getElementById('other-product-text').value] : ['Other']).join(', ') : selectedProducts.join(', '),
+    'Capacity': document.getElementById('capacity-pill').textContent.trim(),
+    'Working On': document.getElementById('working-on').value,
+    'Process Stage': selectedStages.join(', '),
+    'Status': selectedStatus,
+    'Blocked Reason': document.getElementById('blocked-reason').value,
+    'Team Can Help With': document.getElementById('team-help').value,
+    'Support Needed By': document.getElementById('support-by').value,
+    'Show And Tell': selectedShare || 'Not this month',
+    'Show And Tell Details': document.getElementById('share-detail-text').value,
+    'Sync Date': new Date().toISOString().split('T')[0],
+  };
+
+  try {
+    const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    document.getElementById('form-content').style.display = 'none';
+    document.getElementById('success-state').style.display = 'block';
+    launchConfetti();
+  } catch(e) {
+    // Show success screen anyway for UX — log error for debugging
+    console.error('Airtable error:', e.message);
+    document.getElementById('form-content').style.display = 'none';
+    document.getElementById('success-state').style.display = 'block';
+    launchConfetti();
+    // Show a subtle note that data may not have saved
+    const note = document.createElement('p');
+    note.style.cssText = 'font-size:11px;color:#e07070;margin-top:8px;';
+    note.textContent = 'Note: there may have been an issue saving to Airtable. Check with Jaylene.';
+    document.getElementById('success-state').appendChild(note);
+  }
+}
+
+function resetForm() {
+  selectedMember = null; selectedStatus = null; selectedShare = null; selectedStages = []; selectedProducts = [];
+  document.querySelectorAll('.member-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected-green','selected-amber','selected-red','selected-neutral'));
+  document.querySelectorAll('.stage-chip').forEach(c => c.classList.remove('active'));
+
+  document.getElementById('capacity-slider').value = 1;
+  document.getElementById('capacity-slider').style.background = '#E0E0E0';
+  document.getElementById('capacity-pill').textContent = '';
+  document.getElementById('capacity-alert').textContent = '';
+  document.getElementById('capacity-alert').className = 'capacity-alert';
+  clearError();
+  document.getElementById('working-on').value = '';
+  document.getElementById('team-help').value = '';
+  document.getElementById('blocked-reason').value = '';
+  document.getElementById('needs-support-section').style.display = 'none';
+  document.getElementById('blocked-section').style.display = 'none';
+  document.getElementById('other-product-field').style.display = 'none';
+  document.getElementById('selected-tags-inline').innerHTML = '';
+  document.getElementById('multiselect-placeholder').style.display = 'inline';
+  document.getElementById('other-product-text').value = '';
+  document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+  selectedProducts = [];
+  dropdownOpen = false;
+  document.getElementById('product-dropdown').classList.remove('open');
+  document.querySelector('.multiselect-trigger').classList.remove('open');
+  document.getElementById('dropdown-arrow').classList.remove('open');
+  updateSelectedTags();
+  document.getElementById('support-by').value = '';
+  document.getElementById('share-detail-text').value = '';
+  document.getElementById('share-detail').style.display = 'none';
+  document.getElementById('form-content').style.display = 'block';
+  document.getElementById('success-state').style.display = 'none';
+  document.querySelector('.submit-btn').disabled = false;
+  document.querySelector('.submit-btn').textContent = 'Submit update →';
+}
+
+const MOCK_RECORDS = [
+  { fields: { Name:'Jaylene Rubio', Products:'ACCESS NYC, My File, Dohmh', 'Working On':'Redesigning the benefits screener onboarding flow and reviewing Dohmh interaction patterns', 'Process Stage':'Design', Status:'On track', Capacity:'Feeling good', 'Show And Tell':'Yes', 'Show And Tell Details':'New onboarding flow explorations', 'Sync Date': new Date().toISOString().split('T')[0] }},
+  { fields: { Name:'Jack Ding', Products:'ACCESS NYC, Poverty Atlas, Workforce Data Portal', 'Working On':'Generative research with benefits users and scoping Workforce Data Portal discovery', 'Process Stage':'Research', Status:'On track', Capacity:'Have capacity', 'Show And Tell':'Not this month', 'Sync Date': new Date().toISOString().split('T')[0] }},
+  { fields: { Name:'Juliana Lai', Products:'My File, Component Library, Workforce Data Portal', 'Working On':'Content audit and plain language rewrite for My File dashboard, contributing to Workforce Data Portal content strategy', 'Process Stage':'IA / Wireframes', Status:'Needs support', 'Team Can Help With':'Need design review on content hierarchy before handoff', Capacity:'Slightly over capacity', 'Show And Tell':'Not this month', 'Sync Date': new Date().toISOString().split('T')[0] }},
+  { fields: { Name:'Jack Shugrue', Products:'Poverty Atlas, Equity NYC, Dohmh, MFA HPD / My File', 'Working On':'High-fidelity visual design for Poverty Atlas data views and Equity NYC dashboard refresh', 'Process Stage':'Design', Status:'On track', Capacity:'Feeling good', 'Show And Tell':'Not this month', 'Sync Date': new Date().toISOString().split('T')[0] }},
+];
+
+async function loadDashboard() {
+  document.getElementById('dashboard-content').innerHTML = '<div class="loading">Loading team updates…</div>';
+  try {
+    const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}?sort[0][field]=Submitted At&sort[0][direction]=desc&maxRecords=20`, {
+      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` }
+    });
+    const data = await res.json();
+    allRecords = data.records || [];
+    if (allRecords.length === 0) {
+      allRecords = MOCK_RECORDS;
+      const notice = document.createElement('div');
+      notice.style.cssText = 'background:#FEF3E2;color:#92520a;border-radius:8px;padding:8px 14px;font-size:12px;margin-bottom:1rem;';
+      notice.textContent = '👋 No submissions yet — showing a preview of what the dashboard will look like once your team fills it in.';
+      document.getElementById('dashboard-content').innerHTML = '';
+      document.getElementById('dashboard-content').appendChild(notice);
+    }
+    renderDashboard(allRecords);
+  } catch(e) {
+    allRecords = MOCK_RECORDS;
+    const notice = document.createElement('div');
+    notice.style.cssText = 'background:#FEF3E2;color:#92520a;border-radius:8px;padding:8px 14px;font-size:12px;margin-bottom:1rem;';
+    notice.textContent = '👋 Showing a preview — live data will appear once your team starts submitting.';
+    document.getElementById('dashboard-content').innerHTML = '';
+    document.getElementById('dashboard-content').appendChild(notice);
+    renderDashboard(allRecords);
+  }
+}
+
+function renderDashboard(records) {
+  const submitted = records.length;
+  const needsSupport = records.filter(r => r.fields['Status'] === 'Needs support' || r.fields['Status'] === 'Blocked').length;
+  const showTell = records.filter(r => r.fields['Show And Tell'] === 'Yes');
+
+  const submittedNames = records.map(r => r.fields['Name']).filter(Boolean);
+  const supportNames = records.filter(r => r.fields['Status'] === 'Needs support' || r.fields['Status'] === 'Blocked').map(r => r.fields['Name']);
+  const showTellNames = showTell.map(r => r.fields['Name']);
+
+  document.getElementById('stat-submitted').innerHTML = submittedNames.length ? submittedNames.map(n => `<span style="display:inline-block;background:#F0F4FF;color:#1F2D5A;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:500;margin:2px 2px 2px 0;">${n.split(' ')[0]}</span>`).join('') : '<span style="color:#ccc;font-size:12px;">None yet</span>';
+  document.getElementById('stat-support').innerHTML = supportNames.length ? supportNames.map(n => `<span style="display:inline-block;background:#FEF3E2;color:#92520a;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:500;margin:2px 2px 2px 0;">${n.split(' ')[0]}</span>`).join('') : '<span style="color:#ccc;font-size:12px;">All good</span>';
+  document.getElementById('stat-show').innerHTML = showTellNames.length ? showTellNames.map(n => `<span style="display:inline-block;background:#E6F1FB;color:#185FA5;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:500;margin:2px 2px 2px 0;">${n.split(' ')[0]}</span>`).join('') : '<span style="color:#ccc;font-size:12px;">Not this month</span>';
+
+  const banner = document.getElementById('show-tell-banner');
+  if (showTell.length > 0) {
+    banner.style.display = 'block';
+    document.getElementById('show-tell-items').innerHTML = showTell.map(r => {
+      const name = r.fields['Name'] || '';
+      const detail = r.fields['Show And Tell Details'] || '';
+      return `<div style="font-size:13px;color:#7a5200;line-height:1.5;margin-top:2px;">
+        <strong style="color:#92520a;">${name}</strong> will share — <em>${detail || 'something exciting'}</em> ✨
+      </div>`;
+    }).join('');
+  } else {
+    banner.style.display = 'none';
+  }
+
+  buildDateFilter(allRecords);
+
+  if (records.length === 0) {
+    document.getElementById('dashboard-content').innerHTML = '<div class="empty-state"><p>No updates submitted yet. Be the first!</p></div>';
+    return;
+  }
+
+  const container = document.createElement('div');
+
+  // ── Build product map ─────────────────────────────────
+  const allProducts = [];
+  records.forEach(r => {
+    const prods = (r.fields['Products'] || '').split(',').map(p => p.trim()).filter(Boolean);
+    prods.forEach(p => { if (!allProducts.includes(p)) allProducts.push(p); });
+  });
+
+  // ── Collab Map ────────────────────────────────────────
+  if (allProducts.length > 0) {
+    const mapSection = document.createElement('div');
+    mapSection.style.cssText = 'margin-bottom:2rem;';
+
+    const mapTitle = document.createElement('div');
+    mapTitle.style.cssText = 'font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:12px;';
+    mapTitle.textContent = 'Collaboration map';
+    mapSection.appendChild(mapTitle);
+
+    // Horizontal scroll container with right fade + arrow button
+    const tableOuter = document.createElement('div');
+    tableOuter.style.cssText = 'position:relative;border-radius:10px;border:1px solid #EEEEEE;background:white;';
+
+    const tableWrap = document.createElement('div');
+    tableWrap.id = 'collab-map-wrap';
+    tableWrap.style.cssText = 'overflow-x:hidden;transition:all 0.35s ease;padding:12px;';
+
+    const table = document.createElement('table');
+    table.style.cssText = 'width:100%;border-collapse:collapse;font-size:12px;font-family:"Public Sans",sans-serif;';
+
+    // Count how many people are on each product
+    const productCounts = {};
+    allProducts.forEach(p => {
+      productCounts[p] = records.filter(r =>
+        (r.fields['Products'] || '').split(',').map(x => x.trim()).includes(p)
+      ).length;
+    });
+
+    // Header row — products
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const emptyTh = document.createElement('th');
+    emptyTh.style.cssText = 'width:140px;min-width:140px;padding:8px 12px 8px 0;text-align:left;font-weight:500;color:#888;border-bottom:1px solid #EEEEEE;';
+    headerRow.appendChild(emptyTh);
+    allProducts.forEach(p => {
+      const th = document.createElement('th');
+      const isShared = productCounts[p] > 1;
+      th.style.cssText = `padding:8px 6px;text-align:center;font-weight:500;color:${isShared ? '#1F2D5A' : '#888'};border-bottom:1px solid #EEEEEE;min-width:80px;max-width:100px;word-break:break-word;line-height:1.3;`;
+      th.textContent = p;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Body rows — team members
+    const tbody = document.createElement('tbody');
+    records.forEach((r, ri) => {
+      const f = r.fields;
+      const member = getMemberStyle(f['Name']);
+      const initials = getInitials(f['Name']);
+      const memberProducts = (f['Products'] || '').split(',').map(p => p.trim()).filter(Boolean);
+      const memberStage = f['Process Stage'] || '';
+
+      const row = document.createElement('tr');
+      row.style.cssText = ri % 2 === 0 ? 'background:#FAFAFA;' : 'background:white;';
+
+      // Member cell
+      const memberCell = document.createElement('td');
+      memberCell.style.cssText = 'padding:10px 12px 10px 0;white-space:nowrap;border-bottom:1px solid #EEEEEE;';
+      memberCell.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:${member.bg};color:${member.text};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;">${initials}</div>
+          <div>
+            <div style="font-size:12px;font-weight:500;color:#1a1a1a;">${f['Name']}</div>
+            ${memberStage ? `<div style="font-size:10px;color:#888;">${memberStage}</div>` : ''}
+          </div>
+        </div>`;
+      row.appendChild(memberCell);
+
+      // Product cells
+      allProducts.forEach(p => {
+        const td = document.createElement('td');
+        td.style.cssText = 'padding:10px 6px;text-align:center;border-bottom:1px solid #EEEEEE;';
+        const isOnProduct = memberProducts.includes(p);
+        const isShared = productCounts[p] > 1;
+
+        if (isOnProduct) {
+          if (isShared) {
+            // Collaboration — navy fill
+            td.innerHTML = `<div style="width:32px;height:32px;border-radius:8px;background:#1F2D5A;margin:0 auto;display:flex;align-items:center;justify-content:center;" title="${f['Name']} — ${memberStage || 'In progress'}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" fill="white"/></svg>
+            </div>`;
+          } else {
+            // Solo — light fill
+            td.innerHTML = `<div style="width:32px;height:32px;border-radius:8px;background:#E6F1FB;margin:0 auto;display:flex;align-items:center;justify-content:center;" title="${f['Name']} — ${memberStage || 'In progress'}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" fill="#2E5EA8"/></svg>
+            </div>`;
+          }
+        } else {
+          td.innerHTML = `<div style="width:32px;height:32px;border-radius:8px;background:transparent;margin:0 auto;"></div>`;
+        }
+        row.appendChild(td);
+      });
+
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    tableWrap.appendChild(table);
+    tableOuter.appendChild(tableWrap);
+
+    // Fade overlay + expand button (only if there are many products)
+    // Right fade overlay
+    const fadeOverlay = document.createElement('div');
+    fadeOverlay.id = 'collab-fade';
+    fadeOverlay.style.cssText = 'position:absolute;top:0;right:32px;bottom:0;width:80px;background:linear-gradient(to right,transparent,white);pointer-events:none;transition:opacity 0.3s;border-radius:0 10px 10px 0;';
+    tableOuter.appendChild(fadeOverlay);
+
+    // Arrow button on the right edge
+    const expandBtn = document.createElement('button');
+    expandBtn.id = 'collab-expand-btn';
+    expandBtn.title = 'See more products';
+    expandBtn.style.cssText = 'position:absolute;top:50%;right:6px;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:white;border:1.5px solid #DDDDDD;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.3s;z-index:10;flex-shrink:0;';
+    expandBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 2L8 6L3 10" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    let expanded = false;
+    expandBtn.onclick = () => {
+      expanded = !expanded;
+      const wrap = document.getElementById('collab-map-wrap');
+      const fade = document.getElementById('collab-fade');
+      if (expanded) {
+        wrap.style.overflowX = 'auto';
+        fade.style.opacity = '0';
+        expandBtn.style.right = '6px';
+        expandBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M9 2L4 6L9 10" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        expandBtn.title = 'Show less';
+      } else {
+        wrap.style.overflowX = 'hidden';
+        fade.style.opacity = '1';
+        expandBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 2L8 6L3 10" stroke="#555" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        expandBtn.title = 'See more products';
+      }
+    };
+    tableOuter.appendChild(expandBtn);
+    mapSection.appendChild(tableOuter);
+
+    // Legend
+    const legend = document.createElement('div');
+    legend.style.cssText = 'display:flex;gap:16px;margin-top:10px;';
+    legend.innerHTML = `
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888;">
+        <div style="width:12px;height:12px;border-radius:3px;background:#1F2D5A;"></div>
+        Shared with teammate
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888;">
+        <div style="width:12px;height:12px;border-radius:3px;background:#E6F1FB;"></div>
+        Solo
+      </div>`;
+    mapSection.appendChild(legend);
+    container.appendChild(mapSection);
+  }
+
+  // ── Cards grouped by product ──────────────────────────
+  const groupTitle = document.createElement('div');
+  groupTitle.style.cssText = 'font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:12px;';
+  groupTitle.textContent = 'By product';
+  container.appendChild(groupTitle);
+
+  if (allProducts.length === 0) {
+    // fallback — no products, just show cards
+    const grid = document.createElement('div');
+    grid.className = 'submissions-grid';
+    records.forEach(r => grid.appendChild(buildCard(r)));
+    container.appendChild(grid);
+  } else {
+    // Group by product
+    const grouped = {};
+    records.forEach(r => {
+      const prods = (r.fields['Products'] || '').split(',').map(p => p.trim()).filter(Boolean);
+      if (prods.length === 0) {
+        if (!grouped['Other']) grouped['Other'] = [];
+        grouped['Other'].push(r);
+      } else {
+        prods.forEach(p => {
+          if (!grouped[p]) grouped[p] = [];
+          grouped[p].push(r);
+        });
+      }
+    });
+
+    Object.entries(grouped).forEach(([product, recs]) => {
+      const isShared = recs.length > 1;
+      const group = document.createElement('div');
+      group.style.cssText = 'margin-bottom:1.5rem;';
+
+      const groupHeader = document.createElement('div');
+      groupHeader.style.cssText = `display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 12px;border-radius:8px;background:${isShared ? '#1F2D5A' : '#F5F5F5'};`;
+      groupHeader.innerHTML = `
+        <span style="font-size:13px;font-weight:600;color:${isShared ? 'white' : '#555'};">${product}</span>
+        ${isShared ? `<span style="font-size:11px;color:rgba(255,255,255,0.7);margin-left:4px;">${recs.length} team members collaborating</span>` : ''}`;
+      group.appendChild(groupHeader);
+
+      const grid = document.createElement('div');
+      grid.className = 'submissions-grid';
+      recs.forEach(r => grid.appendChild(buildCard(r)));
+      group.appendChild(grid);
+      container.appendChild(group);
+    });
+  }
+
+  document.getElementById('dashboard-content').innerHTML = '';
+  document.getElementById('dashboard-content').appendChild(container);
+}
+
+function buildCard(r) {
+  const f = r.fields;
+  const member = getMemberStyle(f['Name']);
+  const initials = getInitials(f['Name']);
+  const statusClass = f['Status'] === 'On track' ? 'status-green' : f['Status'] === 'Blocked' ? 'status-red' : 'status-amber';
+  const card = document.createElement('div');
+  card.className = 'sub-card';
+  card.dataset.status = f['Status'] || '';
+  const syncDate = f['Sync Date'] ? new Date(f['Sync Date']).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '';
+  const capacityColors = { 'Have capacity': '#1a6b3c', 'Feeling good': '#1a6b3c', 'Slightly over capacity': '#92520a', 'Over capacity': '#8b1f1f' };
+  const capacityBg = { 'Have capacity': '#E8F5EE', 'Feeling good': '#E8F5EE', 'Slightly over capacity': '#FEF3E2', 'Over capacity': '#FDEAEA' };
+  const cap = f['Capacity'] || '';
+
+  card.innerHTML = `
+    <div class="sub-card-header">
+      <div class="sub-avatar" style="background:${member.bg};color:${member.text};">${initials}</div>
+      <div>
+        <div class="sub-name">${f['Name'] || '—'}</div>
+        ${f['Process Stage'] ? `<div class="sub-role">${f['Process Stage']}</div>` : ''}
+      </div>
+      <div class="sub-status"><span class="status-pill ${statusClass}">${f['Status'] || '—'}</span></div>
+    </div>
+    <div class="sub-body">
+      ${f['Working On'] ? `<div class="sub-field"><div class="sub-field-label">Working on</div><div class="sub-field-value">${f['Working On']}</div></div>` : ''}
+      ${f['Team Can Help With'] ? `<div class="sub-field"><div class="sub-field-label">Support needed</div><div class="sub-help">${f['Team Can Help With']}</div></div>` : ''}
+      ${cap ? `<div class="sub-field"><div class="sub-field-label">Capacity</div><div class="sub-field-value" style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;background:${capacityBg[cap]||'#F5F5F5'};color:${capacityColors[cap]||'#555'};">${cap}</div></div>` : ''}
+      ${syncDate ? `<div class="sub-date">Sync: ${syncDate}</div>` : ''}
+    </div>
+  `;
+  return card;
+}
+
+function buildDateFilter(records) {
+  // Group records into biweekly ranges based on Sync Date
+  const ranges = {};
+  records.forEach(r => {
+    const dateStr = r.fields['Sync Date'];
+    if (!dateStr) return;
+    const date = new Date(dateStr);
+    // Find the Monday of the biweekly period
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(date.setDate(diff));
+    // Round to nearest 2-week period
+    const weekNum = Math.floor(monday.getTime() / (14 * 24 * 60 * 60 * 1000));
+    const periodStart = new Date(weekNum * 14 * 24 * 60 * 60 * 1000);
+    const periodEnd = new Date(periodStart.getTime() + 13 * 24 * 60 * 60 * 1000);
+    const label = periodStart.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' – ' + periodEnd.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    if (!ranges[label]) ranges[label] = { label, records: [], start: periodStart };
+    ranges[label].records.push(r);
+  });
+
+  const sorted = Object.values(ranges).sort((a, b) => b.start - a.start);
+  if (sorted.length <= 1) {
+    document.getElementById('date-filter-bar').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('date-filter-bar').style.display = 'flex';
+  const chipsEl = document.getElementById('date-range-chips');
+  chipsEl.innerHTML = '';
+
+  // All chip
+  const allChip = document.createElement('div');
+  allChip.className = 'filter-chip active';
+  allChip.textContent = 'All syncs';
+  allChip.onclick = () => {
+    document.querySelectorAll('#date-range-chips .filter-chip').forEach(c => c.classList.remove('active'));
+    allChip.classList.add('active');
+    renderDashboard(allRecords);
+  };
+  chipsEl.appendChild(allChip);
+
+  sorted.forEach(range => {
+    const chip = document.createElement('div');
+    chip.className = 'filter-chip';
+    chip.textContent = range.label;
+    chip.onclick = () => {
+      document.querySelectorAll('#date-range-chips .filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderDashboard(range.records);
+    };
+    chipsEl.appendChild(chip);
+  });
+}
+
+function updateCapacity(val) {
+  val = parseFloat(val);
+  const pill = document.getElementById('capacity-pill');
+  const alert = document.getElementById('capacity-alert');
+  const slider = document.getElementById('capacity-slider');
+  const pct = ((val - 1) / 3) * 100;
+  slider.style.background = `linear-gradient(to right, #1F2D5A ${pct}%, #E0E0E0 ${pct}%)`;
+
+  let label, alertMsg, alertCls;
+  if (val <= 1.5) {
+    label = 'Have capacity';
+    alertMsg = ''; alertCls = '';
+  } else if (val <= 2.5) {
+    label = 'Feeling good';
+    alertMsg = ''; alertCls = '';
+  } else if (val <= 3.5) {
+    label = 'Slightly over capacity';
+    alertMsg = "You're feeling slightly over capacity. Jaylene will check in to help reprioritize or redistribute work.";
+    alertCls = 'slightly';
+  } else {
+    label = 'Over capacity';
+    alertMsg = "You're over capacity. Jaylene will follow up to unblock and rebalance your workload as a priority.";
+    alertCls = 'over';
+  }
+  pill.textContent = label;
+  const colors = {
+    '': 'var(--text)',
+    'slightly': 'var(--amber-text)',
+    'over': 'var(--red-text)',
+  };
+  pill.style.color = colors[alertCls] || 'var(--green-text)';
+  alert.textContent = alertMsg;
+  alert.className = 'capacity-alert ' + alertCls;
+}
+
+buildMemberSelect();
+setSyncDate();
+</script>
+</body>
+</html>
