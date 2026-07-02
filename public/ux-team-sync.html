@@ -216,6 +216,19 @@
     .member-select, .two-col, .submissions-grid, .stats-row { grid-template-columns: 1fr; }
     .form-header h1 { font-size: 28px; }
   }
+
+  /* TOKEN SETUP BANNER */
+  .token-banner { background: #FEF3E2; border: 1.5px solid #f5bc6a; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .token-banner h3 { font-size: 13px; font-weight: 600; color: #92520a; margin-bottom: 6px; }
+  .token-banner p { font-size: 12px; color: #7a5200; margin-bottom: 10px; line-height: 1.5; }
+  .token-input-row { display: flex; gap: 8px; }
+  .token-input { flex: 1; padding: 8px 10px; border: 1px solid #f5bc6a; border-radius: 8px; font-size: 12px; font-family: 'Public Sans', sans-serif; outline: none; background: white; }
+  .token-input:focus { border-color: #92520a; }
+  .token-save-btn { padding: 8px 16px; background: #92520a; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Public Sans', sans-serif; white-space: nowrap; }
+  .token-save-btn:hover { background: #7a4408; }
+  .token-connected { background: #E8F5EE; border-color: #7dc9a0; display: flex; align-items: center; justify-content: space-between; }
+  .token-connected span { font-size: 12px; color: #1a6b3c; font-weight: 500; }
+  .token-reset-btn { font-size: 11px; color: #1a6b3c; background: none; border: 1px solid #7dc9a0; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Public Sans', sans-serif; }
 </style>
 </head>
 <body>
@@ -228,6 +241,9 @@
     <button class="nav-tab" onclick="showPage('dashboard'); loadDashboard();">Team dashboard</button>
   </div>
 </nav>
+
+<!-- TOKEN BANNER (shown on both pages) -->
+<div id="token-banner-wrap" style="max-width:960px;margin:0 auto;padding:1rem 1.5rem 0;"></div>
 
 <!-- FORM PAGE -->
 <div class="page active" id="page-form">
@@ -420,19 +436,45 @@
 </div>
 
 <script>
-// Token stored in localStorage so it's never committed to the repo.
-// On first visit, the user is prompted to enter their Airtable PAT.
-function getAirtableToken() {
-  let t = localStorage.getItem('ux_sync_airtable_token');
-  if (!t) {
-    t = prompt('Enter your Airtable Personal Access Token to continue:');
-    if (t) localStorage.setItem('ux_sync_airtable_token', t.trim());
-  }
-  return t ? t.trim() : '';
-}
-const AIRTABLE_TOKEN = getAirtableToken();
 const BASE_ID = 'app1m9FE74INmOcrB';
 const TABLE_NAME = 'UX Team Sync';
+
+function getToken() { return localStorage.getItem('ux_sync_airtable_token') || ''; }
+
+function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val) return;
+  localStorage.setItem('ux_sync_airtable_token', val);
+  renderTokenBanner();
+}
+
+function resetToken() {
+  localStorage.removeItem('ux_sync_airtable_token');
+  renderTokenBanner();
+}
+
+function renderTokenBanner() {
+  const wrap = document.getElementById('token-banner-wrap');
+  const token = getToken();
+  if (token) {
+    wrap.innerHTML = `<div class="token-banner token-connected">
+      <span>✓ Connected to Airtable</span>
+      <button class="token-reset-btn" onclick="resetToken()">Change token</button>
+    </div>`;
+  } else {
+    wrap.innerHTML = `<div class="token-banner">
+      <h3>Connect to Airtable</h3>
+      <p>Paste your Airtable Personal Access Token below. It's saved in your browser only — never sent anywhere else.</p>
+      <div class="token-input-row">
+        <input class="token-input" id="token-input" type="password" placeholder="pat…" autocomplete="off">
+        <button class="token-save-btn" onclick="saveToken()">Save & connect</button>
+      </div>
+    </div>`;
+  }
+}
+
+// Thin wrapper so the rest of the code can just use AIRTABLE_TOKEN variable pattern
+function AIRTABLE_TOKEN() { return getToken(); }
 
 const TEAM = [
   { name:'Jaylene Rubio', role:'Associate Director, Product Design', initials:'JR', bg:'#E6F1FB', text:'#185FA5' },
@@ -652,6 +694,7 @@ function clearError() {
 }
 
 async function submitForm() {
+  if (!AIRTABLE_TOKEN()) { showError('Please connect your Airtable token first (see the banner at the top of the page).'); return; }
   const workingOn = document.getElementById('working-on').value.trim();
   const capacityLabel = document.getElementById('capacity-pill').textContent.trim();
 
@@ -687,7 +730,7 @@ async function submitForm() {
   try {
     const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN()}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ fields })
     });
     if (!res.ok) throw new Error(await res.text());
@@ -756,7 +799,7 @@ async function loadDashboard() {
   document.getElementById('dashboard-content').innerHTML = '<div class="loading">Loading team updates…</div>';
   try {
     const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}?sort[0][field]=Submitted At&sort[0][direction]=desc&maxRecords=20`, {
-      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` }
+      headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN()}` }
     });
     const data = await res.json();
     allRecords = data.records || [];
@@ -1150,6 +1193,7 @@ function updateCapacity(val) {
 
 buildMemberSelect();
 setSyncDate();
+renderTokenBanner();
 </script>
 </body>
 </html>
