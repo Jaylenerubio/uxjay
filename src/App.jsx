@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import ActivityPage from './components/ActivityPage';
 import ClientsPage from './components/ClientsPage';
 import DocumentsPage from './components/DocumentsPage';
+import ReviewQueuePage from './components/ReviewQueuePage';
 import ClientDetail from './components/ClientDetail';
 import NoticesPage from './components/NoticesPage';
 import ZodiacFortunePage from './components/ZodiacFortunePage';
@@ -37,7 +38,7 @@ export default function App() {
       case 'dashboard':    return <Dashboard />;
       case 'activity':     return <ActivityPage />;
       case 'clients':      return <ClientsPage onClientSelect={handleClientSelect} />;
-      case 'documents':    return <DocumentsPage />;
+      case 'documents':    return <ReviewQueuePage />;
       case 'notices':      return <NoticesPage />;
       case 'clientDetail': return <ClientDetail clientId={selectedClientId} onBack={handleBack} />;
       default:             return <Dashboard />;
