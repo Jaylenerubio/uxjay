@@ -126,12 +126,12 @@ function isFullyReviewed(client) {
 /* ── Document preview (native PDF embed) ────────────────────────────────── */
 function DocPreview() {
   return (
-    <div style={{ padding: '16px 24px', flexShrink: 0 }}>
+    <div style={{ padding: '16px 24px' }}>
       <iframe
-        src="/placeholder-document.pdf"
+        src="/placeholder-document.pdf#view=FitH"
         title="Document preview"
         style={{
-          height: 420,
+          height: 880,
           width: '100%',
           border: 'none',
           display: 'block',
@@ -268,105 +268,100 @@ export default function ReviewQueuePage() {
         {/* ── Right: document preview ── */}
         {previewOpen && selectedClient && selectedDoc && (
           <div className="rq-preview">
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '16px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-              <div className="avatar avatar-sm" style={{ background: 'var(--avatar-bg)', color: 'var(--avatar-text)', fontSize: 10, marginTop: 2, flexShrink: 0 }}>
+
+            {/* ── Row 1: client identity + close ── */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px 0', flexShrink: 0 }}>
+              <div className="avatar avatar-sm" style={{ background: 'var(--avatar-bg)', color: 'var(--avatar-text)', fontSize: 10, flexShrink: 0 }}>
                 {selectedClient.initials}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--body-text)', fontFamily: 'Public Sans, sans-serif' }}>
-                    {selectedClient.name}
-                  </span>
-                  <span style={{ fontSize: 13, color: 'var(--gray-500)', fontFamily: 'Public Sans, sans-serif' }}>
-                    {selectedDoc.name}
-                  </span>
-                  <span style={{
-                    fontSize: 12, fontWeight: 600,
-                    background: clientReviewed === clientDocCount ? 'var(--green-light)' : 'var(--gray-100)',
-                    color: clientReviewed === clientDocCount ? 'var(--green)' : 'var(--gray-600)',
-                    padding: '2px 9px', borderRadius: 20,
-                    fontFamily: 'Public Sans, sans-serif',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {clientReviewed} of {clientDocCount} reviewed
-                  </span>
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'Public Sans, sans-serif', marginTop: 3 }}>
-                  {selectedClient.caresId} · {selectedDoc.pages} {selectedDoc.pages === 1 ? 'page' : 'pages'} · Date submitted {selectedDoc.date}
-                </div>
-              </div>
+              <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--body-text)', fontFamily: 'Public Sans, sans-serif' }}>
+                {selectedClient.name}
+              </span>
+              <span style={{
+                fontSize: 12, fontWeight: 600,
+                background: clientReviewed === clientDocCount ? 'var(--green-light)' : 'var(--gray-100)',
+                color: clientReviewed === clientDocCount ? 'var(--green)' : 'var(--gray-600)',
+                padding: '2px 9px', borderRadius: 20,
+                fontFamily: 'Public Sans, sans-serif',
+                whiteSpace: 'nowrap',
+              }}>
+                {clientReviewed} of {clientDocCount} reviewed
+              </span>
               <button
                 onClick={() => setPreviewOpen(false)}
-                style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--gray-500)', fontFamily: 'Public Sans, sans-serif', fontWeight: 500, flexShrink: 0, padding: '2px 0' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--gray-500)', fontFamily: 'Public Sans, sans-serif', fontWeight: 500, marginLeft: 'auto', padding: 0 }}
               >
                 <Icon name="x" size={14} /> Close
               </button>
             </div>
 
-            {/* Document preview */}
+            {/* ── Row 2: doc nav + meta + actions ── */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 20px 14px', borderBottom: '1px solid var(--card-border)', flexShrink: 0, flexWrap: 'wrap' }}>
+              {/* Back/Next + doc name */}
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => navigateDoc(-1)}
+                disabled={selectedDocIdx === 0}
+                style={{ padding: '3px 8px', opacity: selectedDocIdx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center' }}
+              >
+                <Icon name="arrow-up" size={13} />
+              </button>
+              <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--body-text)', fontFamily: 'Public Sans, sans-serif' }}>
+                {selectedDoc.name}
+              </span>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => navigateDoc(1)}
+                disabled={selectedDocIdx === clientDocCount - 1}
+                style={{ padding: '3px 8px', opacity: selectedDocIdx === clientDocCount - 1 ? 0.3 : 1, display: 'flex', alignItems: 'center' }}
+              >
+                <Icon name="arrow-down" size={13} />
+              </button>
+              <span style={{ fontSize: 12, color: 'var(--gray-400)', fontFamily: 'Public Sans, sans-serif' }}>
+                {selectedClient.caresId} · {selectedDoc.pages} {selectedDoc.pages === 1 ? 'page' : 'pages'} · {selectedDoc.date}
+              </span>
+
+              {/* Actions */}
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+                {selectedDoc.status === 'new' ? (
+                  <>
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => updateDocStatus('approved')}
+                      style={{ border: '1.5px solid var(--green)', color: 'var(--green)', background: 'transparent', fontWeight: 700 }}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => updateDocStatus('resubmit')}
+                      style={{ border: '1.5px solid var(--red)', color: 'var(--red)', background: 'transparent', fontWeight: 700 }}
+                    >
+                      Resubmit
+                    </button>
+                  </>
+                ) : (
+                  <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'Public Sans, sans-serif', color: selectedDoc.status === 'approved' ? 'var(--green)' : 'var(--red)' }}>
+                    {selectedDoc.status === 'approved' ? '✓ Approved' : '↩ Resubmission requested'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* ── PDF ── */}
             <DocPreview />
 
-            {/* Client description */}
+            {/* ── Client description ── */}
             {selectedDoc.description && (
-              <div style={{ padding: '12px 24px', borderTop: '1px solid var(--card-border)', flexShrink: 0 }}>
+              <div style={{ padding: '12px 24px', borderTop: '1px solid var(--card-border)' }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--body-text)', fontFamily: 'Public Sans, sans-serif' }}>
-                  Client's description{'  '}
+                  Client's description{' '}
                 </span>
                 <span style={{ fontSize: 14, color: 'var(--gray-600)', fontFamily: 'Public Sans, sans-serif' }}>
                   {selectedDoc.description}
                 </span>
               </div>
             )}
-
-            {/* Footer */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', borderTop: '1px solid var(--card-border)', flexShrink: 0 }}>
-              <button className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Icon name="download" size={14} /> Download
-              </button>
-
-              {selectedDoc.status === 'new' ? (
-                <>
-                  <button
-                    className="btn btn-sm"
-                    onClick={() => updateDocStatus('approved')}
-                    style={{ border: '1.5px solid var(--green)', color: 'var(--green)', background: 'transparent', fontWeight: 700 }}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    className="btn btn-sm"
-                    onClick={() => updateDocStatus('resubmit')}
-                    style={{ border: '1.5px solid var(--red)', color: 'var(--red)', background: 'transparent', fontWeight: 700 }}
-                  >
-                    Resubmit
-                  </button>
-                </>
-              ) : (
-                <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'Public Sans, sans-serif', color: selectedDoc.status === 'approved' ? 'var(--green)' : 'var(--red)' }}>
-                  {selectedDoc.status === 'approved' ? '✓ Approved' : '↩ Resubmission requested'}
-                </span>
-              )}
-
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => navigateDoc(-1)}
-                  disabled={selectedDocIdx === 0}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, opacity: selectedDocIdx === 0 ? 0.35 : 1 }}
-                >
-                  <Icon name="arrow-up" size={13} /> Back
-                </button>
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => navigateDoc(1)}
-                  disabled={selectedDocIdx === clientDocCount - 1}
-                  style={{ display: 'flex', alignItems: 'center', gap: 4, opacity: selectedDocIdx === clientDocCount - 1 ? 0.35 : 1 }}
-                >
-                  Next <Icon name="arrow-down" size={13} />
-                </button>
-              </div>
-            </div>
           </div>
         )}
       </div>
