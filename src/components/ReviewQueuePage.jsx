@@ -123,33 +123,20 @@ function isFullyReviewed(client) {
   return client.docs.every(d => d.status !== 'new');
 }
 
-/* ── Document preview placeholder ───────────────────────────────────────── */
+/* ── Document preview (native PDF embed) ────────────────────────────────── */
 function DocPreview() {
   return (
-    <div style={{ background: '#efefef', flex: 1, margin: '0 24px 0', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ width: '65%', maxWidth: 400 }}>
-        <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
-          <div style={{ width: 88, height: 108, background: '#ccc', borderRadius: 4, flexShrink: 0 }} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 8 }}>
-            <div style={{ height: 14, background: '#aaa', borderRadius: 3, width: '85%' }} />
-            <div style={{ height: 10, background: '#bbb', borderRadius: 3, width: '60%' }} />
-            <div style={{ height: 10, background: '#bbb', borderRadius: 3, width: '70%' }} />
-          </div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[100, 90, 95, 80].map((w, i) => (
-            <div key={i} style={{ height: 10, background: '#bbb', borderRadius: 3, width: `${w}%` }} />
-          ))}
-        </div>
-      </div>
-      <button style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.92)', border: '1px solid #ccc', borderRadius: 6, padding: '5px 10px', fontSize: 12, fontFamily: 'Public Sans, sans-serif', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, color: '#374151' }}>
-        Expand
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" />
-          <line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" />
-        </svg>
-      </button>
-    </div>
+    <iframe
+      src="/placeholder-document.pdf"
+      title="Document preview"
+      style={{
+        flex: 1,
+        minHeight: 0,
+        width: '100%',
+        border: 'none',
+        display: 'block',
+      }}
+    />
   );
 }
 
