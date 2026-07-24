@@ -126,7 +126,7 @@ function isFullyReviewed(client) {
 /* ── Document preview (native PDF embed) ────────────────────────────────── */
 function DocPreview() {
   return (
-    <div style={{ padding: '0 24px', flexShrink: 0 }}>
+    <div style={{ padding: '16px 24px', flexShrink: 0 }}>
       <iframe
         src="/placeholder-document.pdf"
         title="Document preview"
