@@ -130,11 +130,11 @@ function DocPreview() {
       src="/placeholder-document.pdf"
       title="Document preview"
       style={{
-        flex: 1,
-        minHeight: 0,
+        height: 420,
         width: '100%',
         border: 'none',
         display: 'block',
+        flexShrink: 0,
       }}
     />
   );
