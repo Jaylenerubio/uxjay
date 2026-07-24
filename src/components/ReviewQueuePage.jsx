@@ -126,17 +126,19 @@ function isFullyReviewed(client) {
 /* ── Document preview (native PDF embed) ────────────────────────────────── */
 function DocPreview() {
   return (
-    <iframe
-      src="/placeholder-document.pdf"
-      title="Document preview"
-      style={{
-        height: 420,
-        width: '100%',
-        border: 'none',
-        display: 'block',
-        flexShrink: 0,
-      }}
-    />
+    <div style={{ padding: '0 24px', flexShrink: 0 }}>
+      <iframe
+        src="/placeholder-document.pdf"
+        title="Document preview"
+        style={{
+          height: 420,
+          width: '100%',
+          border: 'none',
+          display: 'block',
+          borderRadius: 4,
+        }}
+      />
+    </div>
   );
 }
 
